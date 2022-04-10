@@ -11,5 +11,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-add_executable(main main.cpp src/database.cpp include/database.h src/users.cpp include/users.h  src/item.cpp include/item.h)
+# add_executable(main main.cpp src/database.cpp include/database.h)
+add_executable(main main.cpp src/database.cpp include/database.h src/user.cpp include/user.h)
+# add_executable(main main.cpp src/database.cpp include/database.h src/user.cpp include/user.h  src/item.cpp include/item.h)
 target_link_libraries(main Qt5::Core Qt5::Sql)
