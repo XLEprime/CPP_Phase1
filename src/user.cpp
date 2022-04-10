@@ -1,5 +1,5 @@
 ﻿/**
- * @file main.cpp
+ * @file user.cpp
  * @author Haolin Yang
  * @brief
  * @version 0.1
@@ -8,10 +8,3 @@
  * @copyright Copyright (c) 2022
  *
  */
-#include <QtCore>
-#include <QTextStream>
-
-int main()
-{
-    return 0;
-}
