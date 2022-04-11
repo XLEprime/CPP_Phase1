@@ -114,6 +114,7 @@ class UserManage
 private:
     QMap<QString, QSharedPointer<User>> userMap; //用户名到用户对象的映射.
     Database *database;                          //数据库
+    // itemManage
 
     /**
      * @brief 用户鉴权
@@ -122,7 +123,94 @@ private:
      * @return QString 鉴权成功则返回用户名，失败则返回空串.
      * @note 空串可用isEmpty判断.
      */
-    QString tokenVerify(const QJsonObject &token) const;
+    QString verify(const QJsonObject &token) const;
+
+    /**
+     * @brief 减少一个用户的余额，增加另一个用户的余额。
+     *
+     * @param token 第一个用户（减少余额的用户）的token
+     * @param balance 减少量
+     * @param srcUser 第二个用户（增加余额的用户）的用户名
+     * @return true 操作成功
+     * @return false 操作失败
+     */
+    bool changeBalance(const QJsonObject &token, int balance, const QString &dstUser) const;
+
+    //建造itemByJson
+
+public:
+    /**
+     * @brief 禁止默认的构造函数
+     */
+    UserManage() = delete;
+
+    // todo: 增加itemmanage的内容
+    UserManage(Database *_database) : database(_databse) {}
+
+    /**
+     * @brief 注册
+     *
+     * @param username 用户名
+     * @param password 密码
+     * @param type 注册的账号类型 1为CUSTOMER, 2为EXPRESSMAN(Phase2开始出现)
+     * @return QString 如果注册成功，返回空串，否则返回错误信息.
+     * @note ADMINISTRATOR不用支持注册.
+     */
+    QString register(const QString &username, const QString &password, int type) const;
+
+    /**
+     * @brief 登录
+     * @param username 用户名
+     * @param password 密码
+     * @param ret 生成的凭据
+     * @return QString 如果登录成功，返回空串，否则返回错误信息.
+     */
+    QString login(const QString &username, const QString &password, QJsonObject &ret);
+
+    /**
+     * @brief 登出
+     *
+     * @param token 凭据
+     * @return QString 如果登出成功，返回空串，否则返回错误信息.
+     */
+    QString logout(const QJsonObject &token);
+
+    /**
+     * @brief 更改密码
+     *
+     * @param token 凭据
+     * @param newPassword 新密码
+     * @return QString 如果更改成功，返回空串，否则返回错误信息.
+     */
+    QString changePassword(const QJsonObject &token, const QString &newPassword) const;
+
+    /**
+     * @brief 获取用户信息
+     * @param token 凭据
+     * @param ret 用户信息
+     * @return 如果获取成功，返回空串，否则返回错误信息
+     *
+     * 用户信息的格式：
+     * ```json
+     * {
+     *    "username": <字符串>,
+     *    "type": <整数>,
+     *    "balance": <整数>
+     * }
+     * ```
+     */
+    QString getUserInfo(const QJsonObject &token, QJsonObject &ret) const;
+
+    /**
+     * @brief todo
+     *
+     * @param token
+     * @param balance
+     * @return QString
+     */
+    QString changeBalance(const QJsonObject &token, int balance) const;
+
+    //todo 增加物品 修改物品 查询物品 删除物品
 };
 
 #endif
