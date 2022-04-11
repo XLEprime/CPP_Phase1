@@ -145,7 +145,7 @@ public:
     UserManage() = delete;
 
     // todo: 增加itemmanage的内容
-    UserManage(Database *_database) : database(_databse) {}
+    UserManage(Database *_database) : database(_database) {}
 
     /**
      * @brief 注册
@@ -155,8 +155,9 @@ public:
      * @param type 注册的账号类型 1为CUSTOMER, 2为EXPRESSMAN(Phase2开始出现)
      * @return QString 如果注册成功，返回空串，否则返回错误信息.
      * @note ADMINISTRATOR不用支持注册.
+     * @note register是关键字，不能作为函数名.
      */
-    QString register(const QString &username, const QString &password, int type) const;
+    QString registerUser(const QString &username, const QString &password, int type) const;
 
     /**
      * @brief 登录
@@ -210,7 +211,7 @@ public:
      */
     QString changeBalance(const QJsonObject &token, int balance) const;
 
-    //todo 增加物品 修改物品 查询物品 删除物品
+    // todo 增加物品 修改物品 查询物品 删除物品
 };
 
 #endif
