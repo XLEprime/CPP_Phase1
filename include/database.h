@@ -1,13 +1,12 @@
 ﻿/**
  * @file database.h
  * @author Haolin Yang
- * @brief
+ * @brief 数据库类的声明
  * @version 0.1
  * @date 2022-04-10
  *
  * @copyright Copyright (c) 2022
  *
- * @note 数据库类的封装
  * @note 对于用户部分, 定义了插入用户(注册), 查询用户, 修改用户密码, 修改用户余额的接口.
  * @note 对于物品部分, 定义了插入物品, 查询物品, 修改物品信息, 删除物品的接口.
  * @note 额外定义了部分工具接口，有...
@@ -19,9 +18,9 @@
 #include <QFile>
 #include <QtSql>
 
-// #include "item.h"
+#include "item.h"
 
-// class Item;
+class Item;
 
 /**
  * @brief 数据库类
@@ -32,7 +31,7 @@ private:
     QSqlDatabase database;     // SQLite数据库
     QFile userFile;            //永久存储用户名文件
     QTextStream stream;        //用户读写用户名的stream
-    QSet<QString> userNameSet; //用户名集合
+    QSet<QString> usernameSet; //用户名集合
 
     /**
      * @brief 执行SQL语句
@@ -50,6 +49,20 @@ private:
     void modifyData(const QString &table, const QString &id, const QString &key, int value) const;
 
 public:
+    /**
+     * @brief 删除默认构造函数
+     */
+    Database() = delete;
+
+    /**
+     * @brief 构造函数
+     * @param connectionName 连接名称
+     * @param fileName 文件名
+     *
+     * @note 检查是否存在user、item两个table，如果不存在某个表则创建；同时打开用户名文件，将用户名信息读取到usernameSet中。
+     *
+     */
+    Database(const QString &connectionName, const QString &fileName);
     /**
      * @brief 插入用户条目
      *
@@ -92,7 +105,7 @@ public:
      */
     int getQueryMaxId(const QString &table) const;
 
-    //todo: 关于快递的添加
+    // todo: 关于快递的添加
 };
 
 #endif

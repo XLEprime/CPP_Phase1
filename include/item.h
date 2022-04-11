@@ -36,8 +36,8 @@ protected:
     int id;                  // 物品ID 主键
     int cost;                //价格 phase1中为15元一件
     ITEM_STATE state;        //物品状态
-    struct tm sendingTime;   //寄送时间
-    struct tm receivingTime; //接收时间
+    time_t sendingTime;   //寄送时间
+    time_t receivingTime; //接收时间
     QString srcName;         //寄件用户的用户名
     QString dstName;         //收件用户的用户名
     QString description;     //物品描述
@@ -64,8 +64,8 @@ public:
     Item(
         int _id,
         ITEM_STATE _state,
-        struct tm _sendingTime,
-        struct tm _receivingTime,
+        time_t _sendingTime,
+        time_t _receivingTime,
         QString _srcName,
         QString _dstName,
         QString _description) : id(_id),
@@ -93,15 +93,15 @@ public:
 
     /**
      * @brief 获得寄送时间
-     * @return const struct tm& 寄送时间
+     * @return const time_t& 寄送时间
      */
-    const struct tm &getSendingTime() const { return sendingTime; }
+    const time_t &getSendingTime() const { return sendingTime; }
 
     /**
      * @brief 获得接收时间
-     * @return const struct tm& 接收时间
+     * @return const time_t& 接收时间
      */
-    const struct tm &getReceivingTime() const { return receivingTime; }
+    const time_t &getReceivingTime() const { return receivingTime; }
 
     /**
      * @brief 获得寄件用户的用户名
@@ -162,8 +162,8 @@ public:
     bool insertItem(
         const int cost,
         const ITEM_STATE state,
-        const struct tm &sendingTime,
-        const struct tm &receivingTime,
+        const time_t &sendingTime,
+        const time_t &receivingTime,
         const QString &srcName,
         const QString &dstName,
         const QString &description);
