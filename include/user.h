@@ -141,6 +141,7 @@ private:
 public:
     /**
      * @brief 禁止默认的构造函数
+     * @note 用不上
      */
     UserManage() = delete;
 

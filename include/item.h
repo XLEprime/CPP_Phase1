@@ -9,7 +9,7 @@
  *
  * @note 定义了物品和物品管理类.
  * @note 物品类暂不需要继承(pahse2开始需要).
- * @note 物品类中包含两种状态:已签收，待签收(pahse2开始有三种)，包含6种属性:寄送时间、接受时间、寄件用户、收件用户、物品状态、物品描述
+ * @note 物品类中包含两种状态:已签收，待签收(pahse2开始有三种)，包含6种属性:寄送时间、接收时间、寄件用户、收件用户、物品状态、物品描述
  */
 
 #ifndef ITEM_H
@@ -21,22 +21,23 @@
 
 enum ITEM_STATE
 {
-    RECEIVED,        //已签收
-    PENDINGREVEICING //待签收
+    RECEIVED,         //已签收
+    PENDING_REVEICING //待签收
 };
 
 class Database;
 
 /**
- * @brief 物品基础类
+ * @brief 物品基类
  */
 class Item
 {
 protected:
     int id;                  // 物品ID 主键
+    int cost;                //价格 phase1中为15元一件
     ITEM_STATE state;        //物品状态
-    struct tm collectedTime; //寄送时间
-    struct tm receivedTime;  //接受时间
+    struct tm sendingTime;   //寄送时间
+    struct tm receivingTime; //接收时间
     QString srcName;         //寄件用户的用户名
     QString dstName;         //收件用户的用户名
     QString description;     //物品描述
@@ -44,6 +45,7 @@ protected:
 public:
     /**
      * @brief 删除默认构造函数
+     * @note 用不上
      */
     Item() = delete;
 
@@ -52,16 +54,128 @@ public:
      *
      * @param _id 物品ID 主键
      * @param _state 物品状态
-     * @param _collectedTime 寄送时间
-     * @param _receivedTime 接受时间
+     * @param _sendingTime 寄送时间
+     * @param _receivingTime 接收时间
      * @param _srcName 寄件用户的用户名
      * @param _dstName 收件用户的用户名
      * @param _description 物品描述
      * @note 注意是否使用std::move
      */
-    Item(int _id, ITEM_STATE _state, struct tm _collectedTime, struct tm _receivedTime, QString _srcName, QString _dstName, QString _description) : id(_id), state(_state), collectedTime(_collectedTime), receivedTime(_receivedTime), srcName(_srcName), dstName(_dstName), description(_description) {}
+    Item(
+        int _id,
+        ITEM_STATE _state,
+        struct tm _sendingTime,
+        struct tm _receivingTime,
+        QString _srcName,
+        QString _dstName,
+        QString _description) : id(_id),
+                                cost(15),
+                                state(_state),
+                                sendingTime(_sendingTime),
+                                receivingTime(_receivingTime),
+                                srcName(_srcName),
+                                dstName(_dstName),
+                                description(_description) {}
 
     ~Item() = default;
+
+    /**
+     * @brief 获得物品id
+     * @return int 物品id
+     */
+    int getId() const { return id; }
+
+    /**
+     * @brief 获得物品状态
+     * @return const ITEM_STATE 物品状态
+     */
+    const ITEM_STATE getItemState() const { return state; }
+
+    /**
+     * @brief 获得寄送时间
+     * @return const struct tm& 寄送时间
+     */
+    const struct tm &getSendingTime() const { return sendingTime; }
+
+    /**
+     * @brief 获得接收时间
+     * @return const struct tm& 接收时间
+     */
+    const struct tm &getReceivingTime() const { return receivingTime; }
+
+    /**
+     * @brief 获得寄件用户的用户名
+     * @return const QString& 寄件用户的用户名
+     */
+    const QString &getSrcName() const { return srcName; }
+
+    /**
+     * @brief 获得收件用户的用户名
+     * @return const QString& 收件用户的用户名
+     */
+    const QString &getDstName() const { return dstName; }
+
+    /**
+     * @brief 获得描述信息
+     * @return const QString& 描述信息
+     */
+    const QString &getDescription() const { return description; }
 };
 
+/**
+ * @brief 物品管理类
+ */
+class ItemManage
+{
+private:
+    Database *database; //数据库
+    int total;          //物品ID允许的最大值
+
+public:
+    /**
+     * @brief 删除默认构造函数
+     * @note 用不上
+     */
+    ItemManage() = delete;
+
+    /**
+     * @brief 构造函数
+     * @param _database 数据库
+     */
+    ItemManage(Database *_database);
+
+    /**
+     * @brief 插入一个Item
+     *
+     * @param cost 快递花费
+     * @param state 物品状态
+     * @param sendingTime 寄送时间
+     * @param receivingTime 接收时间
+     * @param srcName 寄件用户的用户名
+     * @param dstName 收件用户的用户名
+     * @param description 物品描述
+     * @return true 插入成功
+     * @return false 插入失败
+     *
+     * @note pahse默认cost为15
+     */
+    bool insertItem(
+        const int cost,
+        const ITEM_STATE state,
+        const struct tm &sendingTime,
+        const struct tm &receivingTime,
+        const QString &srcName,
+        const QString &dstName,
+        const QString &description);
+};
+
+    //queryAll
+
+    //queryByFilter
+
+    //queryBySrcName
+
+    //queryByDstName
+
+    //deleteItem
 #endif
