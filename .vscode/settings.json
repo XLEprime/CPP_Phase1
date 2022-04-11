@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "qtsql": "cpp"
+        "*.h": "c",
+        "qtsql": "cpp",
+        "qstring": "cpp"
     }
 }
