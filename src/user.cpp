@@ -71,11 +71,6 @@ bool UserManage::changeBalance(const QJsonObject &token, int balanceChange, cons
         qCritical() << "余额不能为负";
         return false;
     }
-    if (dstUser - balanceChange >= (int)1e9)
-    {
-        qCritical() << "余额不能大于1000000000";
-        return false;
-    }
     if (!changeBalance(token, -balanceChange).isEmpty())
         return false;
     db->modifyUserBalance(dstUser, dstBalance + balanceChange);

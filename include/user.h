@@ -25,8 +25,8 @@
 #include "database.h"
 #include "item.h"
 
-#define CUSTOMER 1
-#define ADMINISTRATOR 2
+const int CUSTOMER = 1;
+const int ADMINISTRATOR = 2;
 
 /**
  * @brief 用户基类
