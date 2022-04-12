@@ -22,15 +22,25 @@ void Database::exec(const QSqlQuery &sqlQuery)
         qDebug() << i.key().toUtf8().data() << ":" << i.value().toString().toUtf8().data();
 }
 
+const QString &Database::getPrimaryKeyByTableName(const QString &tableName)
+{
+    static QString username("username");
+    static QString id("id");
+    if (tableName == "user")
+        return username;
+    else
+        return id;
+}
+
 Database::Database(const QString &connectionName, const QString &fileName)
 {
-    database = QSqlDatabase::addDatabase("QMYSQL", connectionName);
-    database.setDatabaseName("MyDataBase.db");
-    database.open();
+    db = QSqlDatabase::addDatabase("QMYSQL", connectionName);
+    db.setDatabaseName("MyDataBase.db");
+    db.open();
 
-    if (!database.tables().contains("user")) //若不包含user，则创建。
+    if (!db.tables().contains("user")) //若不包含user，则创建。
     {
-        QSqlQuery sqlQuery(database);
+        QSqlQuery sqlQuery(db);
         sqlQuery.prepare("CREATE TABLE user( username TEXT PRIMARY KEY NOT NULL,"
                          "password TEXT NOT NULL,"
                          "type INT NOT NULL,"
@@ -44,9 +54,9 @@ Database::Database(const QString &connectionName, const QString &fileName)
     else
         qDebug() << "user表已存在";
 
-    if (!database.tables().contains("item")) //若不包含item，则创建。
+    if (!db.tables().contains("item")) //若不包含item，则创建。
     {
-        QSqlQuery sqlQuery(database);
+        QSqlQuery sqlQuery(db);
         sqlQuery.prepare("CREATE TABLE item( id INT PRIMARY KEY NOT NULL,"
                          "cost INT NOT NULL,"
                          "type INT NOT NULL,"
@@ -58,10 +68,7 @@ Database::Database(const QString &connectionName, const QString &fileName)
                          "description TEXT NOT NULL) ");
         exec(sqlQuery);
         if (!sqlQuery.exec())
-        {
             qCritical() << "item表创建失败" << sqlQuery.lastError();
-            exit(1);
-        }
         else
             qDebug() << "item表创建成功";
     }
@@ -79,4 +86,17 @@ Database::Database(const QString &connectionName, const QString &fileName)
         QString line = stream.readLine();
         usernameSet.insert(line);
     }
+}
+
+void Database::modifyData(const QString &tableName, const QString &id, const QString &key, int value) const
+{
+    QSqlQuery sqlQuery(db);
+    sqlQuery.prepare("UPDATE " + tableName + " SET " + key + " = :value WHERE " + getPrimaryKeyByTableName(tableName) + " = :id");
+    sqlQuery.bindValue(":value", value);
+    sqlQuery.bindValue(":id", id);
+    exec(sqlQuery);
+    if (!sqlQuery.exec())
+        qCritical() << "修改失败" << sqlQuery.lastError();
+    else
+        qDebug() << "修改成功";
 }

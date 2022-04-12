@@ -28,7 +28,7 @@ class Item;
 class Database
 {
 private:
-    QSqlDatabase database;     // SQLite数据库
+    QSqlDatabase db;     // SQLite数据库
     QFile userFile;            //永久存储用户名文件
     QTextStream stream;        //用户读写用户名的stream
     QSet<QString> usernameSet; //用户名集合
@@ -40,13 +40,23 @@ private:
     static void exec(const QSqlQuery &sqlQuery);
 
     /**
+     * @brief 通过数据库表名获得该表的主键
+     * @param tableName 数据库表名
+     * @return const QString& 主键
+     *
+     * @todo 是否可以不用static
+     */
+    static const QString &getPrimaryKeyByTableName(const QString &tableName);
+
+    /**
      * @brief 修改数据库中某个记录的值
-     * @param table 表名
+     * @param tableName 数据库表名
      * @param id 需要修改的记录的主键
      * @param key 需要修改的键
      * @param value 修改的值
+     * @todo 如果这个函数涉及用户，则将id改为primarykey
      */
-    void modifyData(const QString &table, const QString &id, const QString &key, int value) const;
+    void modifyData(const QString &tableName, const QString &id, const QString &key, int value) const;
 
 public:
     /**
