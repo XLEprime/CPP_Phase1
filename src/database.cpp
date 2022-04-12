@@ -99,9 +99,31 @@ void Database::modifyData(const QString &tableName, const QString &id, const QSt
 
     exec(sqlQuery);
     if (!sqlQuery.exec())
-        qCritical() << "修改失败" << sqlQuery.lastError();
+        qCritical() << "数据库: " << id << " -> "
+                    << value
+                    << " 修改失败" << sqlQuery.lastError();
     else
-        qDebug() << "修改成功";
+        qDebug() << "数据库: " << id << " -> "
+                 << value
+                 << " 修改成功";
+}
+
+void Database::modifyData(const QString &tableName, const QString &id, const QString &key, const QString value) const
+{
+    QSqlQuery sqlQuery(db);
+    sqlQuery.prepare("UPDATE " + tableName + " SET " + key + " = :value WHERE " + getPrimaryKeyByTableName(tableName) + " = :id");
+    sqlQuery.bindValue(":value", value);
+    sqlQuery.bindValue(":id", id);
+
+    exec(sqlQuery);
+    if (!sqlQuery.exec())
+        qCritical() << "数据库: " << id << " -> "
+                    << value
+                    << " 修改失败" << sqlQuery.lastError();
+    else
+        qDebug() << "数据库: " << id << " -> "
+                 << value
+                 << " 修改成功";
 }
 
 void Database::insertUserData(const QString &username, const QString &password, bool type, int balance)
@@ -145,3 +167,10 @@ bool Database::queryUserByName(const QString &username) const
         return false;
     }
 }
+
+void Database::modifyUserpassword(const QString &username, const QString &password) const
+{
+    modifyData("user", username, "password", password);
+}
+
+

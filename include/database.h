@@ -28,7 +28,7 @@ class Item;
 class Database
 {
 private:
-    QSqlDatabase db;     // SQLite数据库
+    QSqlDatabase db;           // SQLite数据库
     QFile userFile;            //永久存储用户名文件
     QTextStream stream;        //用户读写用户名的stream
     QSet<QString> usernameSet; //用户名集合
@@ -49,7 +49,7 @@ private:
     static const QString &getPrimaryKeyByTableName(const QString &tableName);
 
     /**
-     * @brief 修改数据库中某个记录的值
+     * @brief 修改数据库中某个记录的值，值为int类型，对应数据库的INT类型。
      * @param tableName 数据库表名
      * @param id 需要修改的记录的主键
      * @param key 需要修改的键
@@ -57,6 +57,16 @@ private:
      * @todo 如果这个函数涉及用户，则将id改为primarykey
      */
     void modifyData(const QString &tableName, const QString &id, const QString &key, int value) const;
+
+    /**
+     * @brief 修改数据库中某个记录的值，值为QString类型，对应数据库的TEXT类型。
+     * @param tableName 数据库表名
+     * @param id 需要修改的记录的主键
+     * @param key 需要修改的键
+     * @param value 修改的值
+     * @todo 如果这个函数涉及用户，则将id改为primarykey
+     */
+    void modifyData(const QString &tableName, const QString &id, const QString &key, const QString value) const;
 
 public:
     /**
@@ -97,9 +107,9 @@ public:
      * @brief 修改用户密码
      *
      * @param username 用户名
-     * @param passwd 新密码
+     * @param password 新密码
      */
-    void modifyUserPasswd(const QString &username, const QString &passwd) const;
+    void modifyUserpassword(const QString &username, const QString &password) const;
 
     /**
      * @brief 修改用户余额
