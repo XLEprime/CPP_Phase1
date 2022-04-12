@@ -173,4 +173,7 @@ void Database::modifyUserpassword(const QString &username, const QString &passwo
     modifyData("user", username, "password", password);
 }
 
-
+void Database::modifyUserBalance(const QString &username, int balance) const
+{
+    modifyData("user", username, "balance", balance);
+}
