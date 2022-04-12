@@ -91,4 +91,31 @@ QString UserManage::registerUser(const QString &username, const QString &passwor
     return {};
 }
 
-
+QString UserManage::login(const QString &username, const QString &password, QJsonObject &token)
+{
+    QString retPassword;
+    int retType;
+    int retBalance;
+    if (db->queryUserByName(username, retPassword, retType, retBalance) && retPassword == password)
+    {
+        switch (retType)
+        {
+        case CUSTOMER:
+            if (!userMap[username])
+                userMap[username] = QSharedPointer<Customer>::create(retBalance);
+            break;
+        case ADMINISTRATOR:
+            if (!userMap[username])
+                userMap[username] = QSharedPointer<Administrator>::create(retBalance);
+            break;
+        default:
+            return "数据库中用户类型错误";
+            break;
+        }
+        token.insert("iss", "Haolin Yang");
+        token.insert("username", username);
+        return {};
+    }
+    else
+        return "用户名或密码错误";
+}

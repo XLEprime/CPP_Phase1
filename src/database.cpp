@@ -172,6 +172,36 @@ bool Database::queryUserByName(const QString &username) const
     }
 }
 
+bool Database::queryUserByName(const QString &username, QString &password, int &type, int &balance) const
+{
+    QSqlQuery sqlQuery(db);
+    sqlQuery.prepare("SELECT password, type, balance FROM user WHERE username = :username");
+    sqlQuery.bindValue(":username", username);
+
+    exec(sqlQuery);
+    if (!sqlQuery.exec())
+    {
+        qCritical() << "数据库: 用户 " << username << " 查找失败" << sqlQuery.lastError();
+        return false;
+    }
+    else
+    {
+        if (sqlQuery.next())
+        {
+            password = sqlQuery.value(0).toString();
+            type = sqlQuery.value(1).toInt();
+            balance = sqlQuery.value(2).toInt();
+            qDebug() << "数据库: 用户 " << username << "查找成功";
+            return true;
+        }
+        else
+        {
+            qCritical() << "数据库: 用户 " << username << " 查找失败" << sqlQuery.lastError();
+            return false;
+        }
+    }
+}
+
 int Database::queryBalanceByName(const QString &username) const
 {
     QSqlQuery sqlQuery(db);

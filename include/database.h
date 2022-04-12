@@ -94,13 +94,21 @@ public:
     void insertUser(const QString &username, const QString &password, bool type, int balance);
 
     /**
-     * @brief 根据用户名查询用户
-     *
+     * @brief 根据用户名查询用户是否存在
      * @param username 用户名
      * @return true 查询到用户
      * @return false 没查询到用户
      */
     bool queryUserByName(const QString &username) const;
+
+    /**
+     * @brief 根据用户名查询用户是否存在且返回密码，用户类型，余额
+     *
+     * @param username
+     * @return true
+     * @return false
+     */
+    bool queryUserByName(const QString &username, QString &password, int &type, int &balance) const;
 
     /**
      * @brief 获得用户名对应的余额

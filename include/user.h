@@ -143,10 +143,10 @@ public:
      * @brief 登录
      * @param username 用户名
      * @param password 密码
-     * @param ret 生成的凭据
+     * @param token 生成的凭据
      * @return QString 如果登录成功，返回空串，否则返回错误信息.
      */
-    QString login(const QString &username, const QString &password, QJsonObject &ret);
+    QString login(const QString &username, const QString &password, QJsonObject &token);
 
     /**
      * @brief 登出
