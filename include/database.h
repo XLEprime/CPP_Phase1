@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2022
  *
  * @note 对于用户部分, 定义了插入用户(注册), 查询用户, 修改用户密码, 修改用户余额的接口.
- * @note 对于物品部分, 定义了插入物品, 查询物品, 修改物品信息, 删除物品的接口.
+ * @note 对于物品部分, 定义了插入物品, 查询物品(根据发送人/接收人/时间/快递单号即id), 修改物品信息, 删除物品的接口.
  * @note 额外定义了部分工具接口，有...
  */
 
@@ -21,6 +21,7 @@
 #include "item.h"
 
 class Item;
+struct Time;
 
 /**
  * @brief 数据库类
@@ -124,7 +125,54 @@ public:
      */
     int getDBMaxId(const QString &tableName) const;
 
-    // todo: 关于快递的添加
+    /**
+     * @brief 插入物品
+     *
+     * @param id 主键
+     * @param cost 价格 phase1中为15元一件
+     * @param state 物品状态
+     * @param sendingTime 寄送时间
+     * @param receivingTime 接收时间
+     * @param srcName 寄件用户的用户名
+     * @param dstName 收件用户的用户名
+     * @param description 物品描述
+     */
+    void insertItem(int id, int cost, int state, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName, const QString &description);
+
+    /**
+     * @brief 根据单号(id)查询物品
+     * @param id 物品单号
+     * @param result 结果
+     * @return true 查询成功
+     * @return false 查询失败
+     */
+    bool queryItemById(int id, int &result) const;
+
+    /**
+     * @brief 根据寄件用户查询物品
+     */
+    bool queryItemBySrcName(int id, int &result) const;
+
+    /**
+     * @brief 根据收件用户查询物品
+     */
+    bool queryItemByDstName(int id, int &result) const;
+
+    /**
+     * @brief 根据寄送时间查询物品
+     */
+    bool queryItemBySendingTime(int id, int &result) const;
+
+    /**
+     * @brief 根据接收时间查询物品
+     */
+    bool queryItemByReceivingTime(int id, int &result) const;
+
+    /**
+     * @brief 删除物品
+     * @param id 物品单号
+     */
+    void deleteItem(int id) const;
 };
 
 #endif

@@ -25,6 +25,13 @@ enum ITEM_STATE
     PENDING_REVEICING //待签收
 };
 
+struct Time
+{
+    int year;
+    int month;
+    int day;
+};
+
 class Database;
 
 /**
@@ -33,14 +40,14 @@ class Database;
 class Item
 {
 protected:
-    int id;                  // 物品ID 主键
-    int cost;                //价格 phase1中为15元一件
-    ITEM_STATE state;        //物品状态
-    time_t sendingTime;   //寄送时间
-    time_t receivingTime; //接收时间
-    QString srcName;         //寄件用户的用户名
-    QString dstName;         //收件用户的用户名
-    QString description;     //物品描述
+    int id;              // 物品ID 主键
+    int cost;            //价格 phase1中为15元一件
+    ITEM_STATE state;    //物品状态
+    Time sendingTime;    //寄送时间
+    Time receivingTime;  //接收时间
+    QString srcName;     //寄件用户的用户名
+    QString dstName;     //收件用户的用户名
+    QString description; //物品描述
 
 public:
     /**
@@ -64,8 +71,8 @@ public:
     Item(
         int _id,
         ITEM_STATE _state,
-        time_t _sendingTime,
-        time_t _receivingTime,
+        Time _sendingTime,
+        Time _receivingTime,
         QString _srcName,
         QString _dstName,
         QString _description) : id(_id),
@@ -93,15 +100,15 @@ public:
 
     /**
      * @brief 获得寄送时间
-     * @return const time_t& 寄送时间
+     * @return const Time& 寄送时间
      */
-    const time_t &getSendingTime() const { return sendingTime; }
+    const Time &getSendingTime() const { return sendingTime; }
 
     /**
      * @brief 获得接收时间
-     * @return const time_t& 接收时间
+     * @return const Time& 接收时间
      */
-    const time_t &getReceivingTime() const { return receivingTime; }
+    const Time &getReceivingTime() const { return receivingTime; }
 
     /**
      * @brief 获得寄件用户的用户名
@@ -162,20 +169,20 @@ public:
     bool insertItem(
         const int cost,
         const ITEM_STATE state,
-        const time_t &sendingTime,
-        const time_t &receivingTime,
+        const Time &sendingTime,
+        const Time &receivingTime,
         const QString &srcName,
         const QString &dstName,
         const QString &description);
 };
 
-    //queryAll
+// queryAll
 
-    //queryByFilter
+// queryByFilter
 
-    //queryBySrcName
+// queryBySrcName
 
-    //queryByDstName
+// queryByDstName
 
-    //deleteItem
+// deleteItem
 #endif
