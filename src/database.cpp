@@ -90,38 +90,38 @@ Database::Database(const QString &connectionName, const QString &fileName)
     }
 }
 
-void Database::modifyData(const QString &tableName, const QString &id, const QString &key, int value) const
+void Database::modifyData(const QString &tableName, const QString &primaryKey, const QString &key, int value) const
 {
     QSqlQuery sqlQuery(db);
-    sqlQuery.prepare("UPDATE " + tableName + " SET " + key + " = :value WHERE " + getPrimaryKeyByTableName(tableName) + " = :id");
+    sqlQuery.prepare("UPDATE " + tableName + " SET " + key + " = :value WHERE " + getPrimaryKeyByTableName(tableName) + " = :primaryKey");
     sqlQuery.bindValue(":value", value);
-    sqlQuery.bindValue(":id", id);
+    sqlQuery.bindValue(":primaryKey", primaryKey);
 
     exec(sqlQuery);
     if (!sqlQuery.exec())
-        qCritical() << "数据库: " << id << " -> "
+        qCritical() << "数据库: " << key << " : "
                     << value
                     << " 修改失败" << sqlQuery.lastError();
     else
-        qDebug() << "数据库: " << id << " -> "
+        qDebug() << "数据库: " << key << " : "
                  << value
                  << " 修改成功";
 }
 
-void Database::modifyData(const QString &tableName, const QString &id, const QString &key, const QString value) const
+void Database::modifyData(const QString &tableName, const QString &primaryKey, const QString &key, const QString value) const
 {
     QSqlQuery sqlQuery(db);
-    sqlQuery.prepare("UPDATE " + tableName + " SET " + key + " = :value WHERE " + getPrimaryKeyByTableName(tableName) + " = :id");
+    sqlQuery.prepare("UPDATE " + tableName + " SET " + key + " = :value WHERE " + getPrimaryKeyByTableName(tableName) + " = :primaryKey");
     sqlQuery.bindValue(":value", value);
-    sqlQuery.bindValue(":id", id);
+    sqlQuery.bindValue(":primaryKey", primaryKey);
 
     exec(sqlQuery);
     if (!sqlQuery.exec())
-        qCritical() << "数据库: " << id << " -> "
+        qCritical() << "数据库: " << key << " : "
                     << value
                     << " 修改失败" << sqlQuery.lastError();
     else
-        qDebug() << "数据库: " << id << " -> "
+        qDebug() << "数据库: " << key << " : "
                  << value
                  << " 修改成功";
 }

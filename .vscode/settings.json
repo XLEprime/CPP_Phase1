@@ -2,6 +2,7 @@
     "files.associations": {
         "*.h": "c",
         "qtsql": "cpp",
-        "qstring": "cpp"
+        "qstring": "cpp",
+        "thread": "cpp"
     }
 }
