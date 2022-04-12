@@ -73,15 +73,16 @@ public:
      *
      */
     Database(const QString &connectionName, const QString &fileName);
+
     /**
      * @brief 插入用户条目
      *
-     * @param username
-     * @param passwd
-     * @param type
-     * @param balance
+     * @param username 用户名
+     * @param password 密码
+     * @param type 用户类型
+     * @param balance 余额
      */
-    void insertUserData(const QString &username, const QString &passwd, bool type, int balance);
+    void insertUserData(const QString &username, const QString &password, bool type, int balance);
 
     /**
      * @brief 根据用户名查询用户

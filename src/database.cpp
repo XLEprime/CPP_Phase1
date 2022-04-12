@@ -45,6 +45,7 @@ Database::Database(const QString &connectionName, const QString &fileName)
                          "password TEXT NOT NULL,"
                          "type INT NOT NULL,"
                          "balance INT NOT NULL) ");
+
         exec(sqlQuery);
         if (!sqlQuery.exec())
             qCritical() << "user表创建失败" << sqlQuery.lastError();
@@ -66,6 +67,7 @@ Database::Database(const QString &connectionName, const QString &fileName)
                          "srcName TEXT NOT NULL,"
                          "dstName TEXT NOT NULL,"
                          "description TEXT NOT NULL) ");
+
         exec(sqlQuery);
         if (!sqlQuery.exec())
             qCritical() << "item表创建失败" << sqlQuery.lastError();
@@ -94,9 +96,52 @@ void Database::modifyData(const QString &tableName, const QString &id, const QSt
     sqlQuery.prepare("UPDATE " + tableName + " SET " + key + " = :value WHERE " + getPrimaryKeyByTableName(tableName) + " = :id");
     sqlQuery.bindValue(":value", value);
     sqlQuery.bindValue(":id", id);
+
     exec(sqlQuery);
     if (!sqlQuery.exec())
         qCritical() << "修改失败" << sqlQuery.lastError();
     else
         qDebug() << "修改成功";
+}
+
+void Database::insertUserData(const QString &username, const QString &password, bool type, int balance)
+{
+    QSqlQuery sqlQuery(db);
+    sqlQuery.prepare("INSERT INTO user VALUES(:username, :password, :type, :balance)");
+    sqlQuery.bindValue(":username", username);
+    sqlQuery.bindValue(":password", password);
+    sqlQuery.bindValue(":type", type);
+    sqlQuery.bindValue(":balance", balance);
+
+    exec(sqlQuery);
+    if (!sqlQuery.exec())
+        qCritical() << "数据库:插入user " << username << " 失败" << sqlQuery.lastError();
+    else
+        qDebug() << "数据库:插入user " << username << " 成功";
+}
+
+bool Database::queryUserByName(const QString &username) const
+{
+    QSqlQuery sqlQuery(db);
+    sqlQuery.prepare("SELECT * FROM user WHERE username = :username");
+    sqlQuery.bindValue(":username", username);
+
+    exec(sqlQuery);
+    if (!sqlQuery.exec())
+    {
+        qCritical() << "数据库:查找user " << username << " 失败" << sqlQuery.lastError();
+        return false;
+    }
+    else
+    {
+        qDebug() << "数据库:查找user " << username << " 成功";
+        if (sqlQuery.next() && usernameSet.find(username) != usernameSet.constEnd())
+        {
+            qDebug() << "文件中查找到用户"
+                     << "username";
+            return true;
+        }
+        qFatal("数据库和文件不同步");
+        return false;
+    }
 }
