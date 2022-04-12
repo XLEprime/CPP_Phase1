@@ -130,7 +130,7 @@ void Database::modifyData(const QString &tableName, const QString &primaryKey, c
                  << " 修改成功";
 }
 
-void Database::insertUserData(const QString &username, const QString &password, bool type, int balance)
+void Database::insertUser(const QString &username, const QString &password, bool type, int balance)
 {
     QSqlQuery sqlQuery(db);
     sqlQuery.prepare("INSERT INTO user VALUES(:username, :password, :type, :balance)");

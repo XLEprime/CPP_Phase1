@@ -91,7 +91,7 @@ public:
      * @param type 用户类型
      * @param balance 余额
      */
-    void insertUserData(const QString &username, const QString &password, bool type, int balance);
+    void insertUser(const QString &username, const QString &password, bool type, int balance);
 
     /**
      * @brief 根据用户名查询用户

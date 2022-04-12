@@ -74,6 +74,21 @@ bool UserManage::changeBalance(const QJsonObject &token, int balanceChange, cons
     if (!changeBalance(token, -balanceChange).isEmpty())
         return false;
     db->modifyUserBalance(dstUser, dstBalance + balanceChange);
-    qDebug() << dstUser "获得金额: " << balanceChange;
+    qDebug() << dstUser << "获得金额: " << balanceChange;
     return true;
 }
+
+QString UserManage::registerUser(const QString &username, const QString &password, int type) const
+{
+    if (username.isEmpty() || username.size() > 10)
+        return "用户名长度应该在1~10之间";
+    if (db->queryUserByName(username))
+        return "该用户名已被注册";
+    if (type == ADMINISTRATOR)
+        return "管理员类不支持注册";
+    db->insertUser(username, password, type, 0);
+    qDebug() << "用户 " << username << " 注册成功";
+    return {};
+}
+
+
