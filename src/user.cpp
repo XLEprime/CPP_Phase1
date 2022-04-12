@@ -119,3 +119,35 @@ QString UserManage::login(const QString &username, const QString &password, QJso
     else
         return "用户名或密码错误";
 }
+
+QString UserManage::logout(const QJsonObject &token)
+{
+    QString username = verify(token);
+    if (username.isEmpty())
+        return "验证失败";
+    qDebug() << "用户 " << username << " 登出";
+    userMap.remove(username);
+    return {};
+}
+
+QString UserManage::changePassword(const QJsonObject &token, const QString &newPassword) const
+{
+    QString username = verify(token);
+    if (username.isEmpty())
+        return "验证失败";
+    qDebug() << "用户 " << username << " 修改密码为 " << newPassword;
+    db->modifyUserPassword(username, newPassword);
+    return {};
+}
+
+QString UserManage::getUserInfo(const QJsonObject &token, QJsonObject &ret) const
+{
+    QString username = verify(token);
+    if (username.isEmpty())
+        return "验证失败";
+    qDebug() << "获取用户" << username << " 的信息";
+    ret.insert("username", username);
+    ret.insert("type", userMap[username]->getUserType());
+    ret.insert("balance", userMap[username]->getBalance());
+    return {};
+}

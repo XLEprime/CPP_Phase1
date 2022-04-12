@@ -123,7 +123,7 @@ public:
      * @param username 用户名
      * @param password 新密码
      */
-    void modifyUserpassword(const QString &username, const QString &password) const;
+    void modifyUserPassword(const QString &username, const QString &password) const;
 
     /**
      * @brief 修改用户余额

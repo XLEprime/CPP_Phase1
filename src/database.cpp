@@ -227,7 +227,7 @@ int Database::queryBalanceByName(const QString &username) const
     }
 }
 
-void Database::modifyUserpassword(const QString &username, const QString &password) const
+void Database::modifyUserPassword(const QString &username, const QString &password) const
 {
     modifyData("user", username, "password", password);
 }
