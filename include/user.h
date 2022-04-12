@@ -23,7 +23,10 @@
 #include <QJsonValue>
 
 #include "database.h"
-// #include "item.h"
+#include "item.h"
+
+#define CUSTOMER 1
+#define ADMINISTRATOR 2
 
 /**
  * @brief 用户基类
@@ -38,24 +41,18 @@ public:
     User() = default;
 
     /**
-     * @brief Construct a new User object
+     * @brief 构造函数
      *
      * @param _balance 余额
      */
     User(int _balance) : balance(_balance){};
 
-    enum USER_TYPE
-    {
-        CUSTOMER,     //用户类
-        ADMINISTRATOR //管理员
-    };
-
     /**
      * @brief Get the User Type object
      *
-     * @return USER_TYPE 返回UserType
+     * @return int 返回UserType
      */
-    virtual USER_TYPE getUserType() const = 0;
+    virtual int getUserType() const = 0;
 
     virtual ~User() = default;
 };
@@ -69,18 +66,17 @@ public:
     Customer() = default;
 
     /**
-     * @brief Construct a new Customer object
-     *
+     * @brief 构造函数
      * @param _balance 余额
      */
     Customer(int _balance) : User(_balance) {}
 
     /**
-     * @brief Get the User Type object
-     *
-     * @return USER_TYPE 返回UserType
+     * @brief 获得用户类
+     * @return int 返回UserType
+     * @note 1为CUSTOMER 2为ADMINISTRATOR
      */
-    USER_TYPE getUserType() const override { return CUSTOMER; }
+    int getUserType() const override { return CUSTOMER; }
 };
 
 /**
@@ -92,18 +88,17 @@ public:
     Administrator() = default;
 
     /**
-     * @brief Construct a new Administrator object
-     *
+     * @brief 构造函数
      * @param _balance 余额
      */
     Administrator(int _balance) : User(_balance) {}
 
     /**
-     * @brief Get the User Type object
-     *
-     * @return USER_TYPE 返回UserType
+     * @brief 获得用户类
+     * @return int 返回UserType
+     * @note 1为CUSTOMER 2为ADMINISTRATOR
      */
-    USER_TYPE getUserType() const override { return ADMINISTRATOR; }
+    int getUserType() const override { return ADMINISTRATOR; }
 };
 
 /**
@@ -114,11 +109,10 @@ class UserManage
 private:
     QMap<QString, QSharedPointer<User>> userMap; //用户名到用户对象的映射.
     Database *database;                          //数据库
-    // itemManage
+    ItemManage *ItemManage;                      //物品管理类
 
     /**
      * @brief 用户鉴权
-     *
      * @param token 凭据
      * @return QString 鉴权成功则返回用户名，失败则返回空串.
      * @note 空串可用isEmpty判断.
@@ -127,7 +121,6 @@ private:
 
     /**
      * @brief 减少一个用户的余额，增加另一个用户的余额。
-     *
      * @param token 第一个用户（减少余额的用户）的token
      * @param balance 减少量
      * @param srcUser 第二个用户（增加余额的用户）的用户名
