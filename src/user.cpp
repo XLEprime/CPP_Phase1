@@ -28,3 +28,23 @@ QString UserManage::verify(const QJsonObject &token) const
     }
 }
 
+QString UserManage::changeBalance(const QJsonObject &token, int balanceChange, const QString &dstUser) const
+{
+    if (balanceChange >= (int)1e9 || balanceChange <= (int)-1e9)
+        return "单次余额改变量不能超过1000000000";
+
+    QString username = verify(token);
+    if (username.isEmpty())
+        return "验证失败";
+
+    if (userMap[username]->getBalance() + balanceChange < 0)
+        return "余额不能为负";
+
+    if (userMap[username]->getBalance() + balanceChange > (int)1e9)
+        return "余额上限为1000000000";
+
+    qDebug() << "修改用户 " << username << " 成功, 余额为 " << userMap[username]->getBalance() + balanceChange;
+    db->modifyUserBalance(username, userMap[username]->getBalance() + balanceChange);
+    userMap[username]->changeBalance(balanceChange);
+    return {};
+}

@@ -48,11 +48,22 @@ public:
     User(int _balance) : balance(_balance){};
 
     /**
-     * @brief Get the User Type object
-     *
+     * @brief 获得用户类型
      * @return int 返回UserType
      */
     virtual int getUserType() const = 0;
+
+    /**
+     * @brief 获得用户余额
+     * @return int 余额
+     */
+    int getBalance() const { return balance; }
+
+    /**
+     * @brief 改变余额
+     * @param balanceChange 余额增量
+     */
+    void changeBalance(int balanceChange) { balance += balanceChange; }
 
     virtual ~User() = default;
 };
@@ -108,8 +119,8 @@ class UserManage
 {
 private:
     QMap<QString, QSharedPointer<User>> userMap; //用户名到用户对象的映射.
-    Database *database;                          //数据库
-    ItemManage *ItemManage;                      //物品管理类
+    Database *db;                                //数据库
+    ItemManage *itemManage;                      //物品管理类
 
     /**
      * @brief 用户鉴权
@@ -122,12 +133,11 @@ private:
     /**
      * @brief 减少一个用户的余额，增加另一个用户的余额。
      * @param token 第一个用户（减少余额的用户）的token
-     * @param balance 减少量
+     * @param balanceChange 减少量
      * @param srcUser 第二个用户（增加余额的用户）的用户名
-     * @return true 操作成功
-     * @return false 操作失败
+     * @return QString 成功则返回空串，失败则返回错误信息.(用于phase3的弹窗提醒)
      */
-    bool changeBalance(const QJsonObject &token, int balance, const QString &dstUser) const;
+    QString changeBalance(const QJsonObject &token, int balanceChange, const QString &dstUser) const;
 
     //建造itemByJson
 
@@ -139,7 +149,7 @@ public:
     UserManage() = delete;
 
     // todo: 增加itemmanage的内容
-    UserManage(Database *_database) : database(_database) {}
+    UserManage(Database *_db, ItemManage *_itemManage) : db(_db), itemManage(_itemManage) {}
 
     /**
      * @brief 注册
