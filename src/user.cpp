@@ -51,10 +51,34 @@ QString UserManage::changeBalance(const QJsonObject &token, int balanceChange) c
 
 bool UserManage::changeBalance(const QJsonObject &token, int balanceChange, const QString &dstUser) const
 {
+    if (balanceChange >= (int)1e9 || balanceChange <= (int)-1e9)
+        return "单次余额改变量不能超过1000000000";
+
     if (!db->queryUserByName(dstUser))
     {
         qCritical() << "无法查到另一个用户 " << dstUser;
         return false;
     }
 
+    int dstBalance = db->queryBalanceByName(dstUser);
+    if (dstUser + balanceChange >= (int)1e9)
+    {
+        qCritical() << "余额不能大于1000000000";
+        return false;
+    }
+    if (dstUser + balanceChange < 0)
+    {
+        qCritical() << "余额不能为负";
+        return false;
+    }
+    if (dstUser - balanceChange >= (int)1e9)
+    {
+        qCritical() << "余额不能大于1000000000";
+        return false;
+    }
+    if (!changeBalance(token, -balanceChange).isEmpty())
+        return false;
+    db->modifyUserBalance(dstUser, dstBalance + balanceChange);
+    qDebug() << dstUser "获得金额: " << balanceChange;
+    return true;
 }

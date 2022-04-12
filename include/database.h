@@ -107,7 +107,7 @@ public:
      * @param username
      * @return int 余额
      */
-    int getBalanceByName(const QString &username) const;
+    int queryBalanceByName(const QString &username) const;
 
     /**
      * @brief 修改用户密码

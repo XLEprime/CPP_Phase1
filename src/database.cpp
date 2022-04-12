@@ -172,7 +172,7 @@ bool Database::queryUserByName(const QString &username) const
     }
 }
 
-int Database::getBalanceByName(const QString &username) const
+int Database::queryBalanceByName(const QString &username) const
 {
     QSqlQuery sqlQuery(db);
     sqlQuery.prepare("SELECT balance FROM user WHERE username = :username");

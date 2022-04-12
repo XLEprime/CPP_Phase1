@@ -206,12 +206,13 @@ private:
     QString verify(const QJsonObject &token) const;
 
     /**
-     * @brief 减少一个用户的余额，增加另一个用户的余额。
-     * @param token 第一个用户（减少余额的用户）的token
-     * @param balanceChange 减少量
-     * @param srcUser 第二个用户（增加余额的用户）的用户名
+     * @brief 转钱: 减少一个用户的余额，增加另一个用户的余额。
+     * @param token 第一个用户（减去余额增量的用户）的token
+     * @param balanceChange 余额增量
+     * @param srcUser 第二个用户（加上余额增加的用户）的用户名
      * @return true 更改成功
      * @return false 更改失败
+     * @note 余额增量可以为负
      */
     bool changeBalance(const QJsonObject &token, int balanceChange, const QString &dstUser) const;
 
