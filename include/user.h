@@ -34,9 +34,6 @@
  */
 class User
 {
-protected:
-    int balance; //余额
-
 public:
     User() = default;
 
@@ -66,6 +63,9 @@ public:
     void changeBalance(int balanceChange) { balance += balanceChange; }
 
     virtual ~User() = default;
+
+protected:
+    int balance; //余额
 };
 
 /**
@@ -117,30 +117,6 @@ public:
  */
 class UserManage
 {
-private:
-    QMap<QString, QSharedPointer<User>> userMap; //用户名到用户对象的映射.
-    Database *db;                                //数据库
-    ItemManage *itemManage;                      //物品管理类
-
-    /**
-     * @brief 用户鉴权
-     * @param token 凭据
-     * @return QString 鉴权成功则返回用户名，失败则返回空串.
-     * @note 空串可用isEmpty判断.
-     */
-    QString verify(const QJsonObject &token) const;
-
-    /**
-     * @brief 减少一个用户的余额，增加另一个用户的余额。
-     * @param token 第一个用户（减少余额的用户）的token
-     * @param balanceChange 减少量
-     * @param srcUser 第二个用户（增加余额的用户）的用户名
-     * @return QString 成功则返回空串，失败则返回错误信息.(用于phase3的弹窗提醒)
-     */
-    QString changeBalance(const QJsonObject &token, int balanceChange, const QString &dstUser) const;
-
-    //建造itemByJson
-
 public:
     /**
      * @brief 禁止默认的构造函数
@@ -207,15 +183,39 @@ public:
     QString getUserInfo(const QJsonObject &token, QJsonObject &ret) const;
 
     /**
-     * @brief todo
-     *
-     * @param token
-     * @param balance
-     * @return QString
+     * @brief 更改余额(单用户)
+     * @param token 凭据
+     * @param balanceChange 余额增量
+     * @return QString 成功则返回返回空串，失败则返回错误信息.(用于phase3弹窗报错)
      */
-    QString changeBalance(const QJsonObject &token, int balance) const;
+    QString changeBalance(const QJsonObject &token, int balanceChange) const;
 
     // todo 增加物品 修改物品 查询物品 删除物品
+
+private:
+    QMap<QString, QSharedPointer<User>> userMap; //用户名到用户对象的映射.
+    Database *db;                                //数据库
+    ItemManage *itemManage;                      //物品管理类
+
+    /**
+     * @brief 用户鉴权
+     * @param token 凭据
+     * @return QString 鉴权成功则返回用户名，失败则返回空串.
+     * @note 空串可用isEmpty判断.
+     */
+    QString verify(const QJsonObject &token) const;
+
+    /**
+     * @brief 减少一个用户的余额，增加另一个用户的余额。
+     * @param token 第一个用户（减少余额的用户）的token
+     * @param balanceChange 减少量
+     * @param srcUser 第二个用户（增加余额的用户）的用户名
+     * @return true 更改成功
+     * @return false 更改失败
+     */
+    bool changeBalance(const QJsonObject &token, int balanceChange, const QString &dstUser) const;
+
+    //建造itemByJson
 };
 
 #endif

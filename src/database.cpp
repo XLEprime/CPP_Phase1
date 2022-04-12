@@ -172,6 +172,31 @@ bool Database::queryUserByName(const QString &username) const
     }
 }
 
+int Database::getBalanceByName(const QString &username) const
+{
+    QSqlQuery sqlQuery(db);
+    sqlQuery.prepare("SELECT balance FROM user WHERE username = :username");
+    sqlQuery.bindValue(":username", username);
+
+    exec(sqlQuery);
+    if (!sqlQuery.exec())
+    {
+        qCritical() << "数据库:查找user " << username << " 失败" << sqlQuery.lastError();
+        return 0;
+    }
+    else
+    {
+        qDebug() << "数据库:查找user " << username << " 成功";
+        if (sqlQuery.next())
+            return sqlQuery.value(0).toInt();
+        else
+        {
+            qFatal("数据库: user 没有balance项"); // todo: 增加username的值进去
+            return 0;
+        }
+    }
+}
+
 void Database::modifyUserpassword(const QString &username, const QString &password) const
 {
     modifyData("user", username, "password", password);

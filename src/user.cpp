@@ -28,7 +28,7 @@ QString UserManage::verify(const QJsonObject &token) const
     }
 }
 
-QString UserManage::changeBalance(const QJsonObject &token, int balanceChange, const QString &dstUser) const
+QString UserManage::changeBalance(const QJsonObject &token, int balanceChange) const
 {
     if (balanceChange >= (int)1e9 || balanceChange <= (int)-1e9)
         return "单次余额改变量不能超过1000000000";
@@ -47,4 +47,14 @@ QString UserManage::changeBalance(const QJsonObject &token, int balanceChange, c
     db->modifyUserBalance(username, userMap[username]->getBalance() + balanceChange);
     userMap[username]->changeBalance(balanceChange);
     return {};
+}
+
+bool UserManage::changeBalance(const QJsonObject &token, int balanceChange, const QString &dstUser) const
+{
+    if (!db->queryUserByName(dstUser))
+    {
+        qCritical() << "无法查到另一个用户 " << dstUser;
+        return false;
+    }
+
 }

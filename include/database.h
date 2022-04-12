@@ -103,6 +103,13 @@ public:
     bool queryUserByName(const QString &username) const;
 
     /**
+     * @brief 获得用户名对应的余额
+     * @param username
+     * @return int 余额
+     */
+    int getBalanceByName(const QString &username) const;
+
+    /**
      * @brief 修改用户密码
      *
      * @param username 用户名
