@@ -121,10 +121,10 @@ public:
 
     /**
      * @brief 查询表中主键的最大值
-     * @param table 表名
+     * @param tableName 数据库表名
      * @return 返回最大主键允许的s值
      */
-    int getQueryMaxId(const QString &table) const;
+    int getDBMaxId(const QString &tableName) const;
 
     // todo: 关于快递的添加
 };

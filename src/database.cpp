@@ -177,3 +177,23 @@ void Database::modifyUserBalance(const QString &username, int balance) const
 {
     modifyData("user", username, "balance", balance);
 }
+
+int Database::getDBMaxId(const QString &tableName) const
+{
+    QSqlQuery sqlQuery(db);
+    sqlQuery.prepare("SELECT MAX(id) FROM" + tableName);
+
+    exec(sqlQuery);
+    if (!sqlQuery.exec())
+    {
+        qCritical() << "数据库:获得表 " << tableName << " 中主键的最大ID失败";
+        return 0;
+    }
+    else
+    {
+        qDebug() << "数据库:获得表 " << tableName << " 中主键的最大ID成功.";
+        if (sqlQuery.next())
+            return sqlQuery.value(0).toInt();
+        return 0;
+    }
+}
