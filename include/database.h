@@ -21,7 +21,7 @@
 #include "item.h"
 
 class Item;
-struct Time;
+class Time;
 
 /**
  * @brief 数据库类
@@ -132,7 +132,7 @@ public:
      * @param dstName 收件用户的用户名
      * @return int 查到符合条件的数量
      */
-    int queryItemByFilter(QList<QSharedPointer<Item>> &result, int id = -1, const Time &sendingTime = Time{-1, -1, -1}, const Time &receivingTime = Time{-1, -1, -1}, const QString &srcName = "", const QString &dstName = "") const;
+    int queryItemByFilter(QList<QSharedPointer<Item>> &result, int id = -1, const Time &sendingTime = Time(-1, -1, -1), const Time &receivingTime = Time(-1, -1, -1), const QString &srcName = "", const QString &dstName = "") const;
 
     /**
      * @brief 删除物品

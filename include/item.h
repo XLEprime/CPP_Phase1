@@ -23,11 +23,18 @@
 const int RECEIVED = 1;          //已签收
 const int PENDING_REVEICING = 2; //待签收
 
-struct Time
+
+// 时间类
+class Time
 {
-    int year;
-    int month;
-    int day;
+public:
+    int year;  //年
+    int month; //月
+    int day;   //日
+
+    Time() = default;
+    Time(int _year, int _month, int _day) : year(_year), month(_month), day(_day){};
+    ~Time() = default;
 };
 
 class Database;
@@ -184,7 +191,7 @@ public:
      * @param dstName 收件用户的用户名
      * @return int 查到符合条件的数量
      */
-    int queryByFilter(QList<QSharedPointer<Item>> &result, int id = -1, const Time &sendingTime = Time{-1, -1, -1}, const Time &receivingTime = Time{-1, -1, -1}, const QString &srcName = "", const QString &dstName = "") const;
+    int queryByFilter(QList<QSharedPointer<Item>> &result, int id = -1, const Time &sendingTime = Time(-1, -1, -1), const Time &receivingTime = Time(-1, -1, -1), const QString &srcName = "", const QString &dstName = "") const;
 
     /**
      * @brief 从数据库中删除对应id的物品

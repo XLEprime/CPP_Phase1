@@ -30,7 +30,7 @@ int ItemManage::queryAll(QList<QSharedPointer<Item>> &result) const
     return db->queryItemByFilter(result);
 }
 
-int ItemManage::queryByFilter(QList<QSharedPointer<Item>> &result, int id = -1, const Time &sendingTime = Time{-1, -1, -1}, const Time &receivingTime = Time{-1, -1, -1}, const QString &srcName = "", const QString &dstName = "") const
+int ItemManage::queryByFilter(QList<QSharedPointer<Item>> &result, int id, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName) const
 {
     qDebug() << "按条件查询 ";
     return db->queryItemByFilter(result, id, sendingTime, receivingTime, srcName, dstName);

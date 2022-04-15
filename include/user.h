@@ -8,7 +8,7 @@
  * @copyright Copyright (c) 2022
  *
  * @note 定义了用户和用户管理类
- * @note 用户类包括一个抽象的用户基类(其中getUserType函数为纯虚函数), 以及用户类(CUSTOMER)和管理员(ADMINISTRATOR)两个派生类.
+ * @note 用户类包括一个抽象的用户基类(其中getUserType函数为纯虚函数), 以及普通用户类(CUSTOMER)和管理员(ADMINISTRATOR)两个派生类.
  * @note 用户类中保存用户的余额.
  * @note 用户类的对象都是临时对象.
  * @note 用户管理类中定义了大多操作和鉴权.
@@ -23,10 +23,9 @@
 #include <QJsonValue>
 
 #include "database.h"
-#include "item.h"
 
-const int CUSTOMER = 1;
-const int ADMINISTRATOR = 2;
+const int CUSTOMER = 0;
+const int ADMINISTRATOR = 1;
 
 /**
  * @brief 用户基类
@@ -107,7 +106,7 @@ public:
     /**
      * @brief 获得用户类
      * @return int 返回UserType
-     * @note 1为CUSTOMER 2为ADMINISTRATOR
+     * @note 0为CUSTOMER 1为ADMINISTRATOR
      */
     int getUserType() const override { return ADMINISTRATOR; }
 };
@@ -132,7 +131,7 @@ public:
      *
      * @param username 用户名
      * @param password 密码
-     * @param type 注册的账号类型 1为CUSTOMER, 2为EXPRESSMAN(Phase2开始出现)
+     * @param type 注册的账号类型 0为CUSTOMER, 2为EXPRESSMAN(Phase2开始出现)
      * @return QString 如果注册成功，返回空串，否则返回错误信息.
      * @note ADMINISTRATOR不用支持注册.
      * @note register是关键字，不能作为函数名.
