@@ -10,3 +10,34 @@
  */
 
 #include "../include/item.h"
+
+void ItemManage::insertItem(
+    const int cost,
+    const int state,
+    const Time &sendingTime,
+    const Time &receivingTime,
+    const QString &srcName,
+    const QString &dstName,
+    const QString &description)
+{
+    qDebug() << "添加物品 ";
+    db->insertItem(++total, 15, state, sendingTime, receivingTime, srcName, dstName, description);
+}
+
+int ItemManage::queryAll(QList<QSharedPointer<Item>> &result) const
+{
+    qDebug() << "查询所有物品";
+    return db->queryItemByFilter(result);
+}
+
+int ItemManage::queryByFilter(QList<QSharedPointer<Item>> &result, int id = -1, const Time &sendingTime = Time{-1, -1, -1}, const Time &receivingTime = Time{-1, -1, -1}, const QString &srcName = "", const QString &dstName = "") const
+{
+    qDebug() << "按条件查询 ";
+    return db->queryItemByFilter(result, id, sendingTime, receivingTime, srcName, dstName);
+}
+
+void ItemManage::deleteItem(int id) const
+{
+    qDebug() << "按条件查询 ";
+    db->deleteItem(id);
+}

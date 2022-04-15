@@ -18,6 +18,7 @@
 #include <QString>
 #include <QSharedPointer>
 #include <ctime>
+#include "database.h"
 
 const int RECEIVED = 1;          //已签收
 const int PENDING_REVEICING = 2; //待签收
@@ -36,16 +37,6 @@ class Database;
  */
 class Item
 {
-protected:
-    int id;              // 物品ID 主键
-    int cost;            //价格 phase1中为15元一件
-    int state;           //物品状态
-    Time sendingTime;    //寄送时间
-    Time receivingTime;  //接收时间
-    QString srcName;     //寄件用户的用户名
-    QString dstName;     //收件用户的用户名
-    QString description; //物品描述
-
 public:
     /**
      * @brief 删除默认构造函数
@@ -124,6 +115,16 @@ public:
      * @return const QString& 描述信息
      */
     const QString &getDescription() const { return description; }
+
+protected:
+    int id;              // 物品ID 主键
+    int cost;            //价格 phase1中为15元一件
+    int state;           //物品状态
+    Time sendingTime;    //寄送时间
+    Time receivingTime;  //接收时间
+    QString srcName;     //寄件用户的用户名
+    QString dstName;     //收件用户的用户名
+    QString description; //物品描述
 };
 
 /**
@@ -131,10 +132,6 @@ public:
  */
 class ItemManage
 {
-private:
-    Database *database; //数据库
-    int total;          //物品ID允许的最大值
-
 public:
     /**
      * @brief 删除默认构造函数
@@ -149,7 +146,7 @@ public:
     ItemManage(Database *_database);
 
     /**
-     * @brief 插入一个Item
+     * @brief 插入一个Item，会自动分配id.
      *
      * @param cost 快递花费
      * @param state 物品状态
@@ -158,12 +155,10 @@ public:
      * @param srcName 寄件用户的用户名
      * @param dstName 收件用户的用户名
      * @param description 物品描述
-     * @return true 插入成功
-     * @return false 插入失败
      *
      * @note pahse默认cost为15
      */
-    bool insertItem(
+    void insertItem(
         const int cost,
         const int state,
         const Time &sendingTime,
@@ -171,15 +166,34 @@ public:
         const QString &srcName,
         const QString &dstName,
         const QString &description);
+
+    /**
+     * @brief 查询所有物品
+     * @param result 用于返回结果
+     * @return int 查到符合条件的数量
+     */
+    int queryAll(QList<QSharedPointer<Item>> &result) const;
+
+    /**
+     * @brief 根据条件查询物品
+     * @param result 用于返回结果
+     * @param id 物品单号
+     * @param sendingTime 寄送时间
+     * @param receivingTime 接收时间
+     * @param srcName 寄件用户的用户名
+     * @param dstName 收件用户的用户名
+     * @return int 查到符合条件的数量
+     */
+    int queryByFilter(QList<QSharedPointer<Item>> &result, int id = -1, const Time &sendingTime = Time{-1, -1, -1}, const Time &receivingTime = Time{-1, -1, -1}, const QString &srcName = "", const QString &dstName = "") const;
+
+    /**
+     * @brief 从数据库中删除对应id的物品
+     * @param id 物品单号
+     */
+    void deleteItem(int id) const;
+
+private:
+    Database *db; //数据库
+    int total;    //物品ID允许的最大值
 };
-
-// queryAll
-
-// queryByFilter
-
-// queryBySrcName
-
-// queryByDstName
-
-// deleteItem
 #endif
