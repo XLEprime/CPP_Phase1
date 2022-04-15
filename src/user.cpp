@@ -28,30 +28,30 @@ QString UserManage::verify(const QJsonObject &token) const
     }
 }
 
-QString UserManage::changeBalance(const QJsonObject &token, int balanceChange) const
+QString UserManage::addBalance(const QJsonObject &token, int addend) const
 {
-    if (balanceChange >= (int)1e9 || balanceChange <= (int)-1e9)
+    if (addend >= (int)1e9 || addend <= (int)-1e9)
         return "单次余额改变量不能超过1000000000";
 
     QString username = verify(token);
     if (username.isEmpty())
         return "验证失败";
 
-    if (userMap[username]->getBalance() + balanceChange < 0)
+    if (userMap[username]->getBalance() + addend < 0)
         return "余额不能为负";
 
-    if (userMap[username]->getBalance() + balanceChange > (int)1e9)
+    if (userMap[username]->getBalance() + addend > (int)1e9)
         return "余额上限为1000000000";
 
-    qDebug() << "修改用户 " << username << " 成功, 余额为 " << userMap[username]->getBalance() + balanceChange;
-    db->modifyUserBalance(username, userMap[username]->getBalance() + balanceChange);
-    userMap[username]->changeBalance(balanceChange);
+    qDebug() << "修改用户 " << username << " 成功, 余额为 " << userMap[username]->getBalance() + addend;
+    db->modifyUserBalance(username, userMap[username]->getBalance() + addend);
+    userMap[username]->addBalance(addend);
     return {};
 }
 
-bool UserManage::changeBalance(const QJsonObject &token, int balanceChange, const QString &dstUser) const
+bool UserManage::transferBalance(const QJsonObject &token, int balance, const QString &dstUser) const
 {
-    if (balanceChange >= (int)1e9 || balanceChange <= (int)-1e9)
+    if (balance >= (int)1e9 || balance <= (int)-1e9)
         return "单次余额改变量不能超过1000000000";
 
     if (!db->queryUserByName(dstUser))
@@ -61,20 +61,20 @@ bool UserManage::changeBalance(const QJsonObject &token, int balanceChange, cons
     }
 
     int dstBalance = db->queryBalanceByName(dstUser);
-    if (dstUser + balanceChange >= (int)1e9)
+    if (dstUser + balance >= (int)1e9)
     {
         qCritical() << "余额不能大于1000000000";
         return false;
     }
-    if (dstUser + balanceChange < 0)
+    if (dstUser + balance < 0)
     {
         qCritical() << "余额不能为负";
         return false;
     }
-    if (!changeBalance(token, -balanceChange).isEmpty())
+    if (!addBalance(token, -balance).isEmpty())
         return false;
-    db->modifyUserBalance(dstUser, dstBalance + balanceChange);
-    qDebug() << dstUser << "获得金额: " << balanceChange;
+    db->modifyUserBalance(dstUser, dstBalance + balance);
+    qDebug() << dstUser << "获得金额: " << balance;
     return true;
 }
 

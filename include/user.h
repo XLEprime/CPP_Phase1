@@ -58,9 +58,9 @@ public:
 
     /**
      * @brief 改变余额
-     * @param balanceChange 余额增量
+     * @param addend 余额增量
      */
-    void changeBalance(int balanceChange) { balance += balanceChange; }
+    void addBalance(int addend) { balance += addend; }
 
     virtual ~User() = default;
 
@@ -185,10 +185,10 @@ public:
     /**
      * @brief 更改余额(单用户)
      * @param token 凭据
-     * @param balanceChange 余额增量
+     * @param addend 余额增量
      * @return QString 成功则返回返回空串，失败则返回错误信息.(用于phase3弹窗报错)
      */
-    QString changeBalance(const QJsonObject &token, int balanceChange) const;
+    QString addBalance(const QJsonObject &token, int addend) const;
 
     // todo 增加物品 修改物品 查询物品 删除物品
 
@@ -207,14 +207,14 @@ private:
 
     /**
      * @brief 转钱: 减少一个用户的余额，增加另一个用户的余额。
-     * @param token 第一个用户（减去余额增量的用户）的token
-     * @param balanceChange 余额增量
-     * @param srcUser 第二个用户（加上余额增加的用户）的用户名
+     * @param token 第一个用户（减去转移余额量的用户）的token
+     * @param balance 转移余额量
+     * @param srcUser 第二个用户（加上转移余额量的用户）的用户名
      * @return true 更改成功
      * @return false 更改失败
-     * @note 余额增量可以为负
+     * @note 转移余额量可以为负
      */
-    bool changeBalance(const QJsonObject &token, int balanceChange, const QString &dstUser) const;
+    bool transferBalance(const QJsonObject &token, int balance, const QString &dstUser) const;
 
     //建造itemByJson
 };
