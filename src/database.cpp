@@ -370,3 +370,15 @@ int Database::queryItemByFilter(QList<QSharedPointer<Item>> &result, int id, con
         return cnt;
     }
 }
+
+void Database::deleteItem(int id) const
+{
+    QSqlQuery sqlQuery(db);
+    sqlQuery.prepare("DELETE FROM item WHERE id = :id");
+    sqlQuery.bindValue(":id", id);
+    exec(sqlQuery);
+    if (!sqlQuery.exec())
+        qCritical() << "数据库删除id为 " << id << " 的项失败";
+    else
+        qDebug() << "数据库删除id为 " << id << " 的项成功";
+}
