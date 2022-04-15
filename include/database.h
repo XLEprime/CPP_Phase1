@@ -116,6 +116,13 @@ public:
     void insertItem(int id, int cost, int state, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName, const QString &description);
 
     /**
+     * @brief 将数据库的物品查询结果转换成指针
+     * @param sqlQuery 物品类的查询结果
+     * @return QSharedPointer<Item> 一个指向新创建的物品类的指针
+     */
+    QSharedPointer<Item> query2Item(const QSqlQuery &sqlQuery) const;
+
+    /**
      * @brief 根据条件查询物品
      * @param result 用于返回结果
      * @param id 物品单号
@@ -125,7 +132,7 @@ public:
      * @param dstName 收件用户的用户名
      * @return int 查到符合条件的数量
      */
-    int queryItemByFilter(QSharedPointer<Item> &result, int id = -1, const Time &sendingTime = Time{-1, -1, -1}, const Time &receivingTime = Time{-1, -1, -1}, const QString &srcName = "", const QString &dstName = "") const;
+    int queryItemByFilter(QList<QSharedPointer<Item>> &result, int id = -1, const Time &sendingTime = Time{-1, -1, -1}, const Time &receivingTime = Time{-1, -1, -1}, const QString &srcName = "", const QString &dstName = "") const;
 
     /**
      * @brief 删除物品

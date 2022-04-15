@@ -283,7 +283,20 @@ void Database::insertItem(int id, int cost, int state, const Time &sendingTime, 
         qDebug() << "数据库:插入id为 " << id << " 的物品项成功 ";
 }
 
-int Database::queryItemByFilter(QSharedPointer<Item> &result, int id, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName) const
+QSharedPointer<Item> Database::query2Item(const QSqlQuery &sqlQuery) const
+{
+    Time sendingTime{sqlQuery.value(3).toInt(), sqlQuery.value(4).toInt(), sqlQuery.value(5).toInt()};
+    Time receivingTime{sqlQuery.value(6).toInt(), sqlQuery.value(7).toInt(), sqlQuery.value(8).toInt()};
+    return QSharedPointer<Item>::create(sqlQuery.value(0).toInt(),
+                                        sqlQuery.value(1).toInt(),
+                                        sendingTime,
+                                        receivingTime,
+                                        sqlQuery.value(8).toString(),
+                                        sqlQuery.value(9).toString(),
+                                        sqlQuery.value(10).toString());
+}
+
+int Database::queryItemByFilter(QList<QSharedPointer<Item>> &result, int id, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName) const
 {
     QSqlQuery sqlQuery(db);
     QString queryString("SELECT * FROM item");
@@ -350,23 +363,10 @@ int Database::queryItemByFilter(QSharedPointer<Item> &result, int id, const Time
         int cnt = 0;
         while (sqlQuery.next())
         {
-            // result = 转换条目成用户
+            result.append(query2Item(sqlQuery));
             cnt++;
             return true;
         }
         return cnt;
     }
-}
-
-QSharedPointer<Item> Query2Item(const QSqlQuery &sqlQuery)
-{
-    Time sendingTime{sqlQuery.value(3).toInt(), sqlQuery.value(4).toInt(), sqlQuery.value(5).toInt()};
-    Time receivingTime{sqlQuery.value(6).toInt(), sqlQuery.value(7).toInt(), sqlQuery.value(8).toInt()};
-    return QSharedPointer<Item>::create(sqlQuery.value(0).toInt(),
-                                        sqlQuery.value(1).toInt(),
-                                        sendingTime,
-                                        receivingTime,
-                                        sqlQuery.value(8).toString(),
-                                        sqlQuery.value(9).toString(),
-                                        sqlQuery.value(10).toString());
 }
