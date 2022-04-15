@@ -28,45 +28,6 @@ struct Time;
  */
 class Database
 {
-private:
-    QSqlDatabase db;           // SQLite数据库
-    QFile userFile;            //永久存储用户名文件
-    QTextStream stream;        //用户读写用户名的stream
-    QSet<QString> usernameSet; //用户名集合
-
-    /**
-     * @brief 执行SQL语句
-     * @param sqlQuery
-     */
-    static void exec(const QSqlQuery &sqlQuery);
-
-    /**
-     * @brief 通过数据库表名获得该表的主键
-     * @param tableName 数据库表名
-     * @return const QString& 主键
-     *
-     * @todo 是否可以不用static
-     */
-    static const QString &getPrimaryKeyByTableName(const QString &tableName);
-
-    /**
-     * @brief 修改数据库中某个记录的值，值为int类型，对应数据库的INT类型。
-     * @param tableName 数据库表名
-     * @param primaryKey 需要修改的记录的主键
-     * @param key 需要修改的键
-     * @param value 修改的值
-     */
-    void modifyData(const QString &tableName, const QString &primaryKey, const QString &key, int value) const;
-
-    /**
-     * @brief 修改数据库中某个记录的值，值为QString类型，对应数据库的TEXT类型。
-     * @param tableName 数据库表名
-     * @param primaryKey 需要修改的记录的主键
-     * @param key 需要修改的键
-     * @param value 修改的值
-     */
-    void modifyData(const QString &tableName, const QString &primaryKey, const QString &key, const QString value) const;
-
 public:
     /**
      * @brief 删除默认构造函数
@@ -155,39 +116,61 @@ public:
     void insertItem(int id, int cost, int state, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName, const QString &description);
 
     /**
-     * @brief 根据单号(id)查询物品
+     * @brief 根据条件查询物品
+     * @param result 用于返回结果
      * @param id 物品单号
-     * @param result 结果
-     * @return true 查询成功
-     * @return false 查询失败
+     * @param sendingTime 寄送时间
+     * @param receivingTime 接收时间
+     * @param srcName 寄件用户的用户名
+     * @param dstName 收件用户的用户名
+     * @return int 查到符合条件的数量
      */
-    bool queryItemById(int id, int &result) const;
-
-    /**
-     * @brief 根据寄件用户查询物品
-     */
-    bool queryItemBySrcName(int id, int &result) const;
-
-    /**
-     * @brief 根据收件用户查询物品
-     */
-    bool queryItemByDstName(int id, int &result) const;
-
-    /**
-     * @brief 根据寄送时间查询物品
-     */
-    bool queryItemBySendingTime(int id, int &result) const;
-
-    /**
-     * @brief 根据接收时间查询物品
-     */
-    bool queryItemByReceivingTime(int id, int &result) const;
+    int queryItemByFilter(QSharedPointer<Item> &result, int id = -1, const Time &sendingTime = Time{-1, -1, -1}, const Time &receivingTime = Time{-1, -1, -1}, const QString &srcName = "", const QString &dstName = "") const;
 
     /**
      * @brief 删除物品
      * @param id 物品单号
      */
     void deleteItem(int id) const;
+
+private:
+    QSqlDatabase db;           // SQLite数据库
+    QFile userFile;            //永久存储用户名文件
+    QTextStream stream;        //用户读写用户名的stream
+    QSet<QString> usernameSet; //用户名集合
+
+    /**
+     * @brief 执行SQL语句
+     * @param sqlQuery
+     */
+    static void exec(const QSqlQuery &sqlQuery);
+
+    /**
+     * @brief 通过数据库表名获得该表的主键
+     * @param tableName 数据库表名
+     * @return const QString& 主键
+     *
+     * @todo 是否可以不用static
+     */
+    static const QString &getPrimaryKeyByTableName(const QString &tableName);
+
+    /**
+     * @brief 修改数据库中某个记录的值，值为int类型，对应数据库的INT类型。
+     * @param tableName 数据库表名
+     * @param primaryKey 需要修改的记录的主键
+     * @param key 需要修改的键
+     * @param value 修改的值
+     */
+    void modifyData(const QString &tableName, const QString &primaryKey, const QString &key, int value) const;
+
+    /**
+     * @brief 修改数据库中某个记录的值，值为QString类型，对应数据库的TEXT类型。
+     * @param tableName 数据库表名
+     * @param primaryKey 需要修改的记录的主键
+     * @param key 需要修改的键
+     * @param value 修改的值
+     */
+    void modifyData(const QString &tableName, const QString &primaryKey, const QString &key, const QString value) const;
 };
 
 #endif

@@ -60,7 +60,7 @@ Database::Database(const QString &connectionName, const QString &fileName)
         QSqlQuery sqlQuery(db);
         sqlQuery.prepare("CREATE TABLE item( id INT PRIMARY KEY NOT NULL,"
                          "cost INT NOT NULL,"
-                         "type INT NOT NULL,"
+                         //  "type INT NOT NULL,"//pahse2开始有
                          "state INT NOT NULL,"
                          "sendingTime_Year INT NOT NULL,"
                          "sendingTime_Month INT NOT NULL,"
@@ -254,5 +254,106 @@ int Database::getDBMaxId(const QString &tableName) const
         if (sqlQuery.next())
             return sqlQuery.value(0).toInt();
         return 0;
+    }
+}
+
+void Database::insertItem(int id, int cost, int state, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName, const QString &description)
+{
+    QSqlQuery sqlQuery(db);
+    sqlQuery.prepare("INSERT INTO item VALUES(:id, :cost, :type, :state,"
+                     " :sendingTime_Year, :sendingTime_Month, :sendingTime_Day,"
+                     " :receivingTime_Year, :receivingTime_Month, :receivingTime_Day,"
+                     " :srcName, :dstName, :description)");
+    sqlQuery.bindValue(":id", id);
+    sqlQuery.bindValue(":cost", cost);
+    sqlQuery.bindValue(":state", state);
+    sqlQuery.bindValue(":sendingTime_Year", sendingTime.year);
+    sqlQuery.bindValue(":sendingTime_Month", sendingTime.month);
+    sqlQuery.bindValue(":sendingTime_Day", sendingTime.day);
+    sqlQuery.bindValue(":receivingTime_Year", receivingTime.year);
+    sqlQuery.bindValue(":receivingTime_Month", receivingTime.month);
+    sqlQuery.bindValue(":receivingTime_Day", receivingTime.day);
+    sqlQuery.bindValue(":srcName", srcName);
+    sqlQuery.bindValue(":dstName", dstName);
+    sqlQuery.bindValue(":description", description);
+    exec(sqlQuery);
+    if (!sqlQuery.exec())
+        qCritical() << "数据库:插入id为 " << id << " 的物品项失败 " << sqlQuery.lastError();
+    else
+        qDebug() << "数据库:插入id为 " << id << " 的物品项成功 ";
+}
+
+int Database::queryItemByFilter(QSharedPointer<Item> &result, int id, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName) const
+{
+    QSqlQuery sqlQuery(db);
+    QString queryString("SELECT * FROM item");
+    bool flag = false;
+    if (id != -1)
+    {
+        queryString += QString(flag ? " AND " : " WHERE ") + "id = :id";
+        flag = true;
+    }
+    if (sendingTime.day != -1 || sendingTime.month != -1 || sendingTime.day != -1)
+    {
+        queryString += QString(flag ? " AND " : " WHERE ") + "sendingTime_Year = :sendingTime_Year";
+        flag = true;
+        queryString += QString(flag ? " AND " : " WHERE ") + "sendingTime_Month = :sendingTime_Month";
+        queryString += QString(flag ? " AND " : " WHERE ") + "sendingTime_Day = :sendingTime_Day";
+    }
+    if (receivingTime.day != -1 || receivingTime.month != -1 || receivingTime.day != -1)
+    {
+        queryString += QString(flag ? " AND " : " WHERE ") + "receivingTime_Year = :receivingTime_Year";
+        flag = true;
+        queryString += QString(flag ? " AND " : " WHERE ") + "receivingTime_Month = :receivingTime_Month";
+        queryString += QString(flag ? " AND " : " WHERE ") + "receivingTime_Day = :receivingTime_Day";
+    }
+    if (!srcName.isEmpty())
+    {
+        queryString += QString(flag ? " AND " : " WHERE ") + "srcName = :srcName";
+        flag = true;
+    }
+    if (!dstName.isEmpty())
+    {
+        queryString += QString(flag ? " AND " : " WHERE ") + "dstName = :dstName";
+        flag = true;
+    }
+    sqlQuery.prepare(queryString);
+
+    if (id != -1)
+        sqlQuery.bindValue(":id", id);
+    if (sendingTime.day != -1 || sendingTime.month != -1 || sendingTime.day != -1)
+    {
+        sqlQuery.bindValue(":sendingTime_Year", sendingTime.year);
+        sqlQuery.bindValue(":sendingTime_Month", sendingTime.month);
+        sqlQuery.bindValue(":sendingTime_day", sendingTime.day);
+    }
+    if (receivingTime.day != -1 || receivingTime.month != -1 || receivingTime.day != -1)
+    {
+        sqlQuery.bindValue(":receivingTime_Year", receivingTime.year);
+        sqlQuery.bindValue(":receivingTime_Month", receivingTime.month);
+        sqlQuery.bindValue(":receivingTime_day", receivingTime.day);
+    }
+    if (!srcName.isEmpty())
+        sqlQuery.bindValue(":srcName", dstName);
+    if (!dstName.isEmpty())
+        sqlQuery.bindValue(":dstName", dstName);
+
+    exec(sqlQuery);
+    if (!sqlQuery.exec())
+    {
+        qCritical() << "数据库:查找物品失败" << sqlQuery.lastError();
+        return 0;
+    }
+    else
+    {
+        qDebug() << "数据库:查找物品成功";
+        int cnt = 0;
+        while (sqlQuery.next())
+        {
+            // result = 转换条目成用户
+            cnt++;
+            return true;
+        }
+        return cnt;
     }
 }
