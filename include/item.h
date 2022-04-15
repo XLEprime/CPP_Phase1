@@ -19,11 +19,8 @@
 #include <QSharedPointer>
 #include <ctime>
 
-enum ITEM_STATE
-{
-    RECEIVED,         //已签收
-    PENDING_REVEICING //待签收
-};
+const int RECEIVED = 1;          //已签收
+const int PENDING_REVEICING = 2; //待签收
 
 struct Time
 {
@@ -42,7 +39,7 @@ class Item
 protected:
     int id;              // 物品ID 主键
     int cost;            //价格 phase1中为15元一件
-    ITEM_STATE state;    //物品状态
+    int state;           //物品状态
     Time sendingTime;    //寄送时间
     Time receivingTime;  //接收时间
     QString srcName;     //寄件用户的用户名
@@ -68,21 +65,21 @@ public:
      * @param _description 物品描述
      * @note 注意是否使用std::move
      */
-    Item(
-        int _id,
-        ITEM_STATE _state,
-        Time _sendingTime,
-        Time _receivingTime,
-        QString _srcName,
-        QString _dstName,
-        QString _description) : id(_id),
-                                cost(15),
-                                state(_state),
-                                sendingTime(_sendingTime),
-                                receivingTime(_receivingTime),
-                                srcName(_srcName),
-                                dstName(_dstName),
-                                description(_description) {}
+    Item(int _id,
+         int _state,
+         Time _sendingTime,
+         Time _receivingTime,
+         QString _srcName,
+         QString _dstName,
+         QString _description)
+        : id(_id),
+          cost(15),
+          state(_state),
+          sendingTime(_sendingTime),
+          receivingTime(_receivingTime),
+          srcName(_srcName),
+          dstName(_dstName),
+          description(_description) {}
 
     ~Item() = default;
 
@@ -94,9 +91,9 @@ public:
 
     /**
      * @brief 获得物品状态
-     * @return const ITEM_STATE 物品状态
+     * @return const int 物品状态
      */
-    const ITEM_STATE getItemState() const { return state; }
+    const int getItemState() const { return state; }
 
     /**
      * @brief 获得寄送时间
@@ -168,7 +165,7 @@ public:
      */
     bool insertItem(
         const int cost,
-        const ITEM_STATE state,
+        const int state,
         const Time &sendingTime,
         const Time &receivingTime,
         const QString &srcName,

@@ -216,7 +216,12 @@ private:
      */
     bool transferBalance(const QJsonObject &token, int balance, const QString &dstUser) const;
 
-    //建造itemByJson
+    /**
+     * @brief 将数据库的物品查询结果转换成指针
+     * @param sqlQuery 物品类的查询结果
+     * @return QSharedPointer<Item> 一个指向新创建的物品类的指针
+     */
+    QSharedPointer<Item> Query2Item(const QSqlQuery &sqlQuery);
 };
 
 #endif
