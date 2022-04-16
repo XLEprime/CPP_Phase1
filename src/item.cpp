@@ -10,6 +10,7 @@
  */
 
 #include "../include/item.h"
+#include "../include/database.h"
 
 void ItemManage::insertItem(
     const int cost,

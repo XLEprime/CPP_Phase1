@@ -18,7 +18,7 @@
 #include <QString>
 #include <QSharedPointer>
 #include <ctime>
-#include "database.h"
+// #include "database.h"
 
 const int RECEIVED = 1;          //已签收
 const int PENDING_REVEICING = 2; //待签收
@@ -153,9 +153,9 @@ public:
 
     /**
      * @brief 构造函数
-     * @param _database 数据库
+     * @param _db 数据库的指针
      */
-    ItemManage(Database *_database);
+    ItemManage(Database *_db) : db(_db){}
 
     /**
      * @brief 插入一个Item，会自动分配id.

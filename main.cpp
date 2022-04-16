@@ -12,11 +12,37 @@
 #include <QTextStream>
 #include "include/user.h"
 
+void messageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    QByteArray localMsg = msg.toLocal8Bit();
+    const char *file = context.file ? context.file : "";
+    const char *function = context.function ? context.function : "";
+    switch (type)
+    {
+    case QtDebugMsg:
+        fprintf(stdout, "\x1b[33m[Debug]\x1b[36m(%s:%u)\x1b[0m %s\n", file, context.line, localMsg.constData());
+        break;
+    case QtInfoMsg:
+        fprintf(stdout, "\x1b[33m[Info]\x1b[36m(%s:%u)\x1b[0m %s\n", file, context.line, localMsg.constData());
+        break;
+    case QtWarningMsg:
+        fprintf(stdout, "\x1b[33m[Warning]\x1b[36m(%s:%u)\x1b[0m %s\n", file, context.line, localMsg.constData());
+        break;
+    case QtCriticalMsg:
+        fprintf(stdout, "\x1b[33m[Critical]\x1b[36m(%s:%u)\x1b[0m %s\n", file, context.line, localMsg.constData());
+        break;
+    case QtFatalMsg:
+        fprintf(stdout, "\x1b[33m[Fatal]\x1b[36m(%s:%u)\x1b[0m %s\n", file, context.line, localMsg.constData());
+        break;
+    }
+}
+
 int main()
 {
-    Database db("defaultConnection", "users.txt");
-    ItemManage itemManage(&db);
-    UserManage userManage(&db, &itemManage);
+    qInstallMessageHandler(messageHandler);
+    Database database("defaultConnection", "users.txt");
+    ItemManage itemManage(&database);
+    UserManage userManage(&database, &itemManage);
 
     QTextStream istream(stdin);
     QTextStream ostream(stdout);
