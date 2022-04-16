@@ -43,10 +43,14 @@ int main()
             qInfo() << "修改密码: changepassword <新密码>";
             qInfo() << "查看个人信息: info";
             qInfo() << "充值: addbalance <增加量>";
-            qInfo() << "查询快递: query <物品单号> <寄送时间年> <寄送时间月> <寄送时间日> <接收时间年> <接收时间月> <接收时间日> <寄件用户的用户名> <收件用户的用户名>";
+            qInfo() << "查询所有快递: queryall";
+            qInfo() << "    注意此功能仅限管理员使用。";
+            qInfo() << "查询所有符合条件的快递: query <物品单号> <寄送时间年> <寄送时间月> <寄送时间日> <接收时间年> <接收时间月> <接收时间日> <寄件用户的用户名> <收件用户的用户名>";
             qInfo() << "    若要查询所有符合该条件的物品，则该条件用*代替。注意此功能仅限管理员使用。";
-            qInfo() << "查找发出的快递: querysrc <物品单号> <寄送时间年> <寄送时间月> <寄送时间日> <接收时间年> <接收时间月> <接收时间日> <收件用户的用户名>";
-            qInfo() << "查找将收到的快递: querysrc <物品单号> <寄送时间年> <寄送时间月> <寄送时间日> <接收时间年> <接收时间月> <接收时间日> <寄件用户的用户名>";
+            qInfo() << "查找发出的符合条件的快递: querysrc <物品单号> <寄送时间年> <寄送时间月> <寄送时间日> <接收时间年> <接收时间月> <接收时间日> <收件用户的用户名>";
+            qInfo() << "    若要查询所有符合该条件的物品，则该条件用*代替。";
+            qInfo() << "查找将收到的符合条件的快递: querysrc <物品单号> <寄送时间年> <寄送时间月> <寄送时间日> <接收时间年> <接收时间月> <接收时间日> <寄件用户的用户名>";
+            qInfo() << "    若要查询所有符合该条件的物品，则该条件用*代替。";
         }
         else if (args[0] == "register" && args.size() == 3) // register 用户名 密码 在phase2开始添加type
         {
@@ -131,6 +135,28 @@ int main()
             else
                 qInfo() << "余额充值失败 " << ret;
         }
+        else if (args[0] == "queryall")
+        {
+            if (token.isNull())
+            {
+                qInfo() << "当前没有用户登录，请登录后重试。";
+                continue;
+            }
+            QJsonObject filter;
+            filter.insert("type", 1);
+            QJsonArray queryRet;
+            QString ret = userManage.queryItem(token.toObject(), filter, queryRet);
+            if (ret.isEmpty())
+                for (const auto &i : queryRet)
+                {
+                    QJsonObject item = i.toObject();
+                    qInfo() << "物品单号为 " << item["id"] << " 花费为 " << item["cost"] << " 状态为 " << item["state"] << " 寄送时间为 " << item["sendingTime_Year"] << "年" << item["sendingTime_Month"] << "月" << item["sendingTime_Day"] << "日"
+                            << " 接收时间为 " << item["recevingTime_Year"] << "年" << item["recevingTime_Month"] << "月" << item["recevingTime_Day"] << "日"
+                            << " 寄件人为 " << item["srcName"] << "收件人为" << item["dstName"];
+                }
+            else
+                qInfo() << "查询失败" << ret;
+        }
         else if (args[0] == "query" && args.size() == 10 && args[1].toInt(&ok) && ok && args[2].toInt(&ok) && ok && args[3].toInt(&ok) && ok && args[4].toInt(&ok) && ok && args[5].toInt(&ok) && ok && args[6].toInt(&ok) && ok && args[7].toInt(&ok) && ok)
         {
             if (token.isNull())
@@ -138,9 +164,115 @@ int main()
                 qInfo() << "当前没有用户登录，请登录后重试。";
                 continue;
             }
-            //未完待续
+            QJsonObject filter;
+            filter.insert("type", 1);
+            if (args[1] != "*")
+                filter.insert("id", args[1].toInt());
+            if (args[2] != "*")
+                filter.insert("sendingTime_Year", args[2].toInt());
+            if (args[3] != "*")
+                filter.insert("sendingTime_Month", args[3].toInt());
+            if (args[4] != "*")
+                filter.insert("sendingTime_Day", args[4].toInt());
+            if (args[5] != "*")
+                filter.insert("receivingTime_Year", args[5].toInt());
+            if (args[6] != "*")
+                filter.insert("receivingTime_Month", args[6].toInt());
+            if (args[7] != "*")
+                filter.insert("receivingTime_Day", args[7].toInt());
+            if (args[8] != "*")
+                filter.insert("srcName", args[8]);
+            if (args[9] != "*")
+                filter.insert("dstName", args[9]);
+            QJsonArray queryRet;
+            QString ret = userManage.queryItem(token.toObject(), filter, queryRet);
+            if (ret.isEmpty())
+                for (const auto &i : queryRet)
+                {
+                    QJsonObject item = i.toObject();
+                    qInfo() << "物品单号为 " << item["id"] << " 花费为 " << item["cost"] << " 状态为 " << item["state"] << " 寄送时间为 " << item["sendingTime_Year"] << "年" << item["sendingTime_Month"] << "月" << item["sendingTime_Day"] << "日"
+                            << " 接收时间为 " << item["recevingTime_Year"] << "年" << item["recevingTime_Month"] << "月" << item["recevingTime_Day"] << "日"
+                            << " 寄件人为 " << item["srcName"] << "收件人为" << item["dstName"];
+                }
+            else
+                qInfo() << "查询失败" << ret;
         }
-
+        else if (args[0] == "querysrc" && args.size() == 9 && args[1].toInt(&ok) && ok && args[2].toInt(&ok) && ok && args[3].toInt(&ok) && ok && args[4].toInt(&ok) && ok && args[5].toInt(&ok) && ok && args[6].toInt(&ok) && ok && args[7].toInt(&ok) && ok)
+        {
+            if (token.isNull())
+            {
+                qInfo() << "当前没有用户登录，请登录后重试。";
+                continue;
+            }
+            QJsonObject filter;
+            filter.insert("type", 2);
+            if (args[1] != "*")
+                filter.insert("id", args[1].toInt());
+            if (args[2] != "*")
+                filter.insert("sendingTime_Year", args[2].toInt());
+            if (args[3] != "*")
+                filter.insert("sendingTime_Month", args[3].toInt());
+            if (args[4] != "*")
+                filter.insert("sendingTime_Day", args[4].toInt());
+            if (args[5] != "*")
+                filter.insert("receivingTime_Year", args[5].toInt());
+            if (args[6] != "*")
+                filter.insert("receivingTime_Month", args[6].toInt());
+            if (args[7] != "*")
+                filter.insert("receivingTime_Day", args[7].toInt());
+            if (args[8] != "*")
+                filter.insert("dstName", args[8]);
+            QJsonArray queryRet;
+            QString ret = userManage.queryItem(token.toObject(), filter, queryRet);
+            if (ret.isEmpty())
+                for (const auto &i : queryRet)
+                {
+                    QJsonObject item = i.toObject();
+                    qInfo() << "物品单号为 " << item["id"] << " 花费为 " << item["cost"] << " 状态为 " << item["state"] << " 寄送时间为 " << item["sendingTime_Year"] << "年" << item["sendingTime_Month"] << "月" << item["sendingTime_Day"] << "日"
+                            << " 接收时间为 " << item["recevingTime_Year"] << "年" << item["recevingTime_Month"] << "月" << item["recevingTime_Day"] << "日"
+                            << " 寄件人为 " << item["srcName"] << "收件人为" << item["dstName"];
+                }
+            else
+                qInfo() << "查询失败" << ret;
+        }
+        else if (args[0] == "querydst" && args.size() == 9 && args[1].toInt(&ok) && ok && args[2].toInt(&ok) && ok && args[3].toInt(&ok) && ok && args[4].toInt(&ok) && ok && args[5].toInt(&ok) && ok && args[6].toInt(&ok) && ok && args[7].toInt(&ok) && ok)
+        {
+            if (token.isNull())
+            {
+                qInfo() << "当前没有用户登录，请登录后重试。";
+                continue;
+            }
+            QJsonObject filter;
+            filter.insert("type", 2);
+            if (args[1] != "*")
+                filter.insert("id", args[1].toInt());
+            if (args[2] != "*")
+                filter.insert("sendingTime_Year", args[2].toInt());
+            if (args[3] != "*")
+                filter.insert("sendingTime_Month", args[3].toInt());
+            if (args[4] != "*")
+                filter.insert("sendingTime_Day", args[4].toInt());
+            if (args[5] != "*")
+                filter.insert("receivingTime_Year", args[5].toInt());
+            if (args[6] != "*")
+                filter.insert("receivingTime_Month", args[6].toInt());
+            if (args[7] != "*")
+                filter.insert("receivingTime_Day", args[7].toInt());
+            if (args[8] != "*")
+                filter.insert("srcName", args[8]);
+            QJsonArray queryRet;
+            QString ret = userManage.queryItem(token.toObject(), filter, queryRet);
+            if (ret.isEmpty())
+                for (const auto &i : queryRet)
+                {
+                    QJsonObject item = i.toObject();
+                    qInfo() << "物品单号为 " << item["id"] << " 花费为 " << item["cost"] << " 状态为 " << item["state"] << " 寄送时间为 " << item["sendingTime_Year"] << "年" << item["sendingTime_Month"] << "月" << item["sendingTime_Day"] << "日"
+                            << " 接收时间为 " << item["recevingTime_Year"] << "年" << item["recevingTime_Month"] << "月" << item["recevingTime_Day"] << "日"
+                            << " 寄件人为 " << item["srcName"] << "收件人为" << item["dstName"];
+                }
+            else
+                qInfo() << "查询失败" << ret;
+        }
         else
             qInfo() << "指令输入有误，请输入help查看帮助";
     }

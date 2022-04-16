@@ -23,6 +23,7 @@
 #include <QJsonValue>
 
 #include "database.h"
+#include "item.h"
 
 const int CUSTOMER = 0;
 const int ADMINISTRATOR = 1;
@@ -123,7 +124,6 @@ public:
      */
     UserManage() = delete;
 
-    // todo: 增加itemmanage的内容
     UserManage(Database *_db, ItemManage *_itemManage) : db(_db), itemManage(_itemManage) {}
 
     /**
@@ -189,32 +189,6 @@ public:
      */
     QString addBalance(const QJsonObject &token, int addend) const;
 
-    // todo 增加物品 修改物品 查询物品 删除物品
-
-private:
-    QMap<QString, QSharedPointer<User>> userMap; //用户名到用户对象的映射.
-    Database *db;                                //数据库
-    ItemManage *itemManage;                      //物品管理类
-
-    /**
-     * @brief 用户鉴权
-     * @param token 凭据
-     * @return QString 鉴权成功则返回用户名，失败则返回空串.
-     * @note 空串可用isEmpty判断.
-     */
-    QString verify(const QJsonObject &token) const;
-
-    /**
-     * @brief 转钱: 减少一个用户的余额，增加另一个用户的余额。
-     * @param token 第一个用户（减去转移余额量的用户）的token
-     * @param balance 转移余额量
-     * @param srcUser 第二个用户（加上转移余额量的用户）的用户名
-     * @return true 更改成功
-     * @return false 更改失败
-     * @note 转移余额量可以为负
-     */
-    bool transferBalance(const QJsonObject &token, int balance, const QString &dstUser) const;
-
     /**
      * @brief 按照条件查询商品，条件以Json给出。
      * @param 用户鉴权
@@ -223,10 +197,18 @@ private:
      * @return QString 查询成功则返回空串，否则返回错误信息
      *
      * @note 查询格式有:
-     * 1. 查询所有商品
+     * 1. 查询所有符合条件的商品
      * ```json
      * {
      *      "type": 0
+     *      可选："id" : <整数>,
+     *      可选："sendingTime_Year" : <整数>,
+     *      可选："sendingTime_Month" : <整数>,
+     *      可选："sendingTime_Day" : <整数>,
+     *      可选："receivingTime_Year" : <整数>,
+     *      可选："receivingTime_Month" : <整数>,
+     *      可选："receivingTime_Day" : <整数>,
+     *      可选："dstName" : <字符串>
      * }
      * ```
      * 2. 按条件查询该用户发出的所有物品
@@ -259,6 +241,32 @@ private:
      * ```
      */
     QString queryItem(const QJsonObject &token, const QJsonObject &filter, QJsonArray &ret) const;
+
+    // todo 增加物品 修改物品 删除物品
+
+private:
+    QMap<QString, QSharedPointer<User>> userMap; //用户名到用户对象的映射.
+    Database *db;                                //数据库
+    ItemManage *itemManage;                      //物品管理类
+
+    /**
+     * @brief 用户鉴权
+     * @param token 凭据
+     * @return QString 鉴权成功则返回用户名，失败则返回空串.
+     * @note 空串可用isEmpty判断.
+     */
+    QString verify(const QJsonObject &token) const;
+
+    /**
+     * @brief 转钱: 减少一个用户的余额，增加另一个用户的余额。
+     * @param token 第一个用户（减去转移余额量的用户）的token
+     * @param balance 转移余额量
+     * @param srcUser 第二个用户（加上转移余额量的用户）的用户名
+     * @return true 更改成功
+     * @return false 更改失败
+     * @note 转移余额量可以为负
+     */
+    bool transferBalance(const QJsonObject &token, int balance, const QString &dstUser) const;
 };
 
 #endif
