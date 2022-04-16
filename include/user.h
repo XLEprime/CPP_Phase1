@@ -214,6 +214,51 @@ private:
      * @note 转移余额量可以为负
      */
     bool transferBalance(const QJsonObject &token, int balance, const QString &dstUser) const;
+
+    /**
+     * @brief 按照条件查询商品，条件以Json给出。
+     * @param 用户鉴权
+     * @param filter 条件
+     * @param ret 查询结果
+     * @return QString 查询成功则返回空串，否则返回错误信息
+     *
+     * @note 查询格式有:
+     * 1. 查询所有商品
+     * ```json
+     * {
+     *      "type": 0
+     * }
+     * ```
+     * 2. 按条件查询该用户发出的所有物品
+     * ```json
+     * {
+     *      "type": 1,
+     *      可选："id" : <整数>,
+     *      可选："sendingTime_Year" : <整数>,
+     *      可选："sendingTime_Month" : <整数>,
+     *      可选："sendingTime_Day" : <整数>,
+     *      可选："receivingTime_Year" : <整数>,
+     *      可选："receivingTime_Month" : <整数>,
+     *      可选："receivingTime_Day" : <整数>,
+     *      可选："dstName" : <字符串>
+     * }
+     * ```
+     * 2. 按条件查询该用户将收到的所有物品
+     * ```json
+     * {
+     *      "type": 2,
+     *      可选："id" : <整数>,
+     *      可选："sendingTime_Year" : <整数>,
+     *      可选："sendingTime_Month" : <整数>,
+     *      可选："sendingTime_Day" : <整数>,
+     *      可选："receivingTime_Year" : <整数>,
+     *      可选："receivingTime_Month" : <整数>,
+     *      可选："receivingTime_Day" : <整数>,
+     *      可选："srcName" : <字符串>
+     * }
+     * ```
+     */
+    QString queryItem(const QJsonObject &token, const QJsonObject &filter, QJsonArray &ret) const;
 };
 
 #endif

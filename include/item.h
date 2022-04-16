@@ -23,7 +23,6 @@
 const int RECEIVED = 1;          //已签收
 const int PENDING_REVEICING = 2; //待签收
 
-
 // 时间类
 class Time
 {
@@ -88,10 +87,16 @@ public:
     int getId() const { return id; }
 
     /**
+     * @brief 获得物品花费
+     * @return int 物品花费
+     */
+    int getCost() const { return cost; }
+
+    /**
      * @brief 获得物品状态
      * @return const int 物品状态
      */
-    const int getItemState() const { return state; }
+    const int getState() const { return state; }
 
     /**
      * @brief 获得寄送时间

@@ -78,6 +78,95 @@ bool UserManage::transferBalance(const QJsonObject &token, int balance, const QS
     return true;
 }
 
+QString UserManage::queryItem(const QJsonObject &token, const QJsonObject &filter, QJsonArray &ret) const
+{
+    bool ok;
+    if (!filter.contains("type"))
+        return "缺少type键";
+    int cnt;
+    QList<QSharedPointer<Item>> result;
+    QString username = verify(token);
+
+    switch (filter["type"].toInt())
+    {
+    case 0:
+        if (userMap[username]->getUserType() != ADMINISTRATOR)
+            return "非管理员不能查看所有物品";
+        cnt = itemManage->queryAll(result);
+        break;
+    case 1:
+    {
+        int id = -1;
+        Time sendingTime(-1, -1, -1), receivingTime(-1, -1, -1);
+        QString dstName("");
+        if (filter.contains("id"))
+            id = filter["id"].toInt();
+        if (filter.contains("sendingTime_Year"))
+            sendingTime.year = filter["sendingTime_Year"].toInt();
+        if (filter.contains("sendingTime_Month"))
+            sendingTime.month = filter["sendingTime_Month"].toInt();
+        if (filter.contains("sendingTime_Day"))
+            sendingTime.day = filter["sendingTime_Day"].toInt();
+        if (filter.contains("receivingTime_Year"))
+            receivingTime.year = filter["receivingTime_Year"].toInt();
+        if (filter.contains("receivingTime_Month"))
+            receivingTime.month = filter["receivingTime_Month"].toInt();
+        if (filter.contains("receivingTime_Day"))
+            receivingTime.day = filter["receivingTime_Day"].toInt();
+        if (filter.contains("dstName"))
+            dstName = filter["dstName"].toString();
+        cnt = itemManage->queryByFilter(result, id, sendingTime, receivingTime, username, dstName);
+    }
+    break;
+    case 2:
+    {
+        int id = -1;
+        Time sendingTime(-1, -1, -1), receivingTime(-1, -1, -1);
+        QString srcName("");
+        if (filter.contains("id"))
+            id = filter["id"].toInt();
+        if (filter.contains("sendingTime_Year"))
+            sendingTime.year = filter["sendingTime_Year"].toInt();
+        if (filter.contains("sendingTime_Month"))
+            sendingTime.month = filter["sendingTime_Month"].toInt();
+        if (filter.contains("sendingTime_Day"))
+            sendingTime.day = filter["sendingTime_Day"].toInt();
+        if (filter.contains("receivingTime_Year"))
+            receivingTime.year = filter["receivingTime_Year"].toInt();
+        if (filter.contains("receivingTime_Month"))
+            receivingTime.month = filter["receivingTime_Month"].toInt();
+        if (filter.contains("receivingTime_Day"))
+            receivingTime.day = filter["receivingTime_Day"].toInt();
+        if (filter.contains("srcName"))
+            srcName = filter["srcName"].toString();
+        cnt = itemManage->queryByFilter(result, id, sendingTime, receivingTime, srcName, username);
+    }
+    break;
+    default:
+        return "type键的值有误";
+        break;
+    }
+
+    for (const QSharedPointer<Item> &item : result)
+    {
+        QJsonObject itemJson;
+        itemJson.insert("id", item->getId());
+        itemJson.insert("cost", item->getCost());
+        itemJson.insert("state", item->getState());
+        itemJson.insert("sendingTime_Year", item->getSendingTime().year);
+        itemJson.insert("sendingTime_Month", item->getSendingTime().month);
+        itemJson.insert("sendingTime_Day", item->getSendingTime().day);
+        itemJson.insert("receivingTime_Year", item->getReceivingTime().year);
+        itemJson.insert("receivingTime_Month", item->getReceivingTime().month);
+        itemJson.insert("receivingTime_Day", item->getReceivingTime().day);
+        itemJson.insert("srcName", item->getSrcName());
+        itemJson.insert("dstName", item->getDstName());
+        itemJson.insert("description", item->getDescription());
+        ret.append(itemJson);
+    }
+    return {};
+}
+
 QString UserManage::registerUser(const QString &username, const QString &password, int type) const
 {
     if (username.isEmpty() || username.size() > 10)

@@ -27,7 +27,7 @@ void ItemManage::insertItem(
 int ItemManage::queryAll(QList<QSharedPointer<Item>> &result) const
 {
     qDebug() << "查询所有物品";
-    return db->queryItemByFilter(result);
+    return db->queryItemByFilter(result, -1, Time(-1, -1, -1), Time(-1, -1, -1), "", "");
 }
 
 int ItemManage::queryByFilter(QList<QSharedPointer<Item>> &result, int id, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName) const
