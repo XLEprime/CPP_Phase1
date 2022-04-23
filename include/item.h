@@ -17,24 +17,10 @@
 
 #include <QString>
 #include <QSharedPointer>
-#include <ctime>
-// #include "database.h"
+#include "time.h"
 
 const int RECEIVED = 1;          //已签收
 const int PENDING_REVEICING = 2; //待签收
-
-// 时间类
-class Time
-{
-public:
-    int year;  //年
-    int month; //月
-    int day;   //日
-
-    Time() = default;
-    Time(int _year, int _month, int _day) : year(_year), month(_month), day(_day){};
-    ~Time() = default;
-};
 
 class Database;
 

@@ -240,3 +240,12 @@ QString UserManage::getUserInfo(const QJsonObject &token, QJsonObject &ret) cons
     ret.insert("balance", userMap[username]->getBalance());
     return {};
 }
+
+QString UserManage::getTime(QJsonObject &ret) const
+{
+    qDebug() << "获取物流系统时间信息";
+    ret.insert("year", timeManage->getCurYear());
+    ret.insert("month", timeManage->getCurMonth());
+    ret.insert("day", timeManage->getCurDay());
+    return {};
+}

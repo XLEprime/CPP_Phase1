@@ -42,7 +42,8 @@ int main()
     qInstallMessageHandler(messageHandler);
     Database database("defaultConnection", "users.txt");
     ItemManage itemManage(&database);
-    UserManage userManage(&database, &itemManage);
+    TimeManage timeManage;
+    UserManage userManage(&database, &itemManage, &timeManage);
 
     QTextStream istream(stdin);
     QTextStream ostream(stdout);
@@ -52,7 +53,7 @@ int main()
     QVector<QString> userType{"CUSTOMER", "ADMINISTRATOR"};
     QString input;
 
-    qInfo() << "欢迎使用";
+    qInfo() << "欢迎使用本物流系统，输入 help 获得帮助。";
 
     while (true)
     {
@@ -63,6 +64,8 @@ int main()
 
         if (args[0] == "help" && args.size() == 1)
         {
+            qInfo() << "系统时间: time";
+            qInfo() << "加快系统时间: addtime <天数>";
             qInfo() << "注册: register <用户名> <密码>";
             qInfo() << "登录: login <用户名> <密码>";
             qInfo() << "登出: logout";
@@ -77,6 +80,21 @@ int main()
             qInfo() << "    若要查询所有符合该条件的物品，则该条件用*代替。";
             qInfo() << "查找将收到的符合条件的快递: querysrc <物品单号> <寄送时间年> <寄送时间月> <寄送时间日> <接收时间年> <接收时间月> <接收时间日> <寄件用户的用户名>";
             qInfo() << "    若要查询所有符合该条件的物品，则该条件用*代替。";
+        }
+        else if (args[0] == "time" && args.size() == 1)
+        {
+            QJsonObject retInfo;
+            QString ret = userManage.getTime(retInfo);
+            if (ret.isEmpty())
+            {
+                qInfo() << "查询物流系统时间成功，当前时间为" << retInfo["year"].toInt() << "/" << retInfo["month"].toInt() << "/" << retInfo["day"].toInt();
+            }
+        }
+        else if (args[0] == "addtime" && args.size() == 2 && args[1].toInt(&ok) && ok)
+        {
+            QString ret = userManage.timeManage->addDays(args[1].toInt());
+            if (ret.isEmpty())
+                qInfo() << "物流系统时间增加成功。";
         }
         else if (args[0] == "register" && args.size() == 3) // register 用户名 密码 在phase2开始添加type
         {
@@ -166,7 +184,7 @@ int main()
             else
                 qInfo() << "余额充值失败 " << ret;
         }
-        else if (args[0] == "queryall")
+        else if (args[0] == "queryall" && args.size() == 1)
         {
             if (token.isNull())
             {

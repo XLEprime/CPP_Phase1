@@ -24,6 +24,7 @@
 
 #include "database.h"
 #include "item.h"
+#include "time.h"
 
 const int CUSTOMER = 0;
 const int ADMINISTRATOR = 1;
@@ -118,13 +119,15 @@ public:
 class UserManage
 {
 public:
+    TimeManage *timeManage; //时间管理类
+
     /**
      * @brief 禁止默认的构造函数
      * @note 用不上
      */
     UserManage() = delete;
 
-    UserManage(Database *_db, ItemManage *_itemManage) : db(_db), itemManage(_itemManage) {}
+    UserManage(Database *_db, ItemManage *_itemManage, TimeManage *_timeManage) : db(_db), itemManage(_itemManage), timeManage(_timeManage) {}
 
     /**
      * @brief 注册
@@ -241,6 +244,23 @@ public:
      * ```
      */
     QString queryItem(const QJsonObject &token, const QJsonObject &filter, QJsonArray &ret) const;
+
+    /**
+     * @brief 获取物流系统时间
+     *
+     * @param ret 结果
+     * @return QString 成功则返回空串，否则返回错误信息
+     *
+     * 时间信息的格式：
+     * ```json
+     * {
+     *    "year": <字符串>,
+     *    "month": <整数>,
+     *    "day": <整数>
+     * }
+     * ```
+     */
+    QString getTime(QJsonObject &ret) const;
 
     // todo 增加物品 修改物品 删除物品
 
