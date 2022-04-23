@@ -141,9 +141,13 @@ void Database::insertUser(const QString &username, const QString &password, bool
 
     exec(sqlQuery);
     if (!sqlQuery.exec())
-        qCritical() << "数据库:插入user " << username << " 失败" << sqlQuery.lastError();
-    else
+    {
         qDebug() << "数据库:插入user " << username << " 成功";
+        usernameSet.insert(username);
+        stream << username << endl; // 向文件中写入用户名
+    }
+    else
+        qCritical() << "数据库:插入user " << username << " 失败" << sqlQuery.lastError();
 }
 
 bool Database::queryUserByName(const QString &username) const
@@ -222,7 +226,7 @@ int Database::queryBalanceByName(const QString &username) const
             return sqlQuery.value(0).toInt();
         else
         {
-            qFatal("数据库: user 没有balance项"); // todo: 增加username的值进去
+            qFatal("数据库: user 没有balance项"); // todo: 增加username的值进Fatal提示中
             return 0;
         }
     }
