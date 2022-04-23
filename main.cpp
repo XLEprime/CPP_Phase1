@@ -145,14 +145,19 @@ int main()
             QString ret = userManage.getUserInfo(token.toObject(), retInfo);
             if (ret.isEmpty())
             {
-                qInfo() << "查询用户信息成功 用户名为 " << retInfo["username"] << " 类型为 " << userType[retInfo["type"].toInt()] << " 余额为 " << retInfo["balance"];
+                qInfo() << "查询用户信息成功 用户名为 " << retInfo["username"].toString() << " 类型为 " << userType[retInfo["type"].toInt()] << " 余额为 " << retInfo["balance"].toInt();
             }
         }
-        else if (args[0] == "addbalance" && args.size() == 2 && args[1].toInt(&ok) && ok)
+        else if (args[0] == "addbalance" && args.size() == 2)
         {
             if (token.isNull())
             {
                 qInfo() << "当前没有用户登录，请登录后重试。";
+                continue;
+            }
+            if (!args[1].toInt(&ok) || !ok)
+            {
+                qInfo() << "单次余额改变量不能超过1000000000";
                 continue;
             }
             QString ret = userManage.addBalance(token.toObject(), args[1].toInt());

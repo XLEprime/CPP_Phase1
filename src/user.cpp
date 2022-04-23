@@ -23,14 +23,14 @@ QString UserManage::verify(const QJsonObject &token) const
     }
     else
     {
-        qDebug() << "用户 " << token["username"] << " 验证成功";
+        qDebug() << "用户 " << token["username"].toString() << " 验证成功";
         return token["username"].toString();
     }
 }
 
 QString UserManage::addBalance(const QJsonObject &token, int addend) const
 {
-    if (addend >= (int)1e9 || addend <= (int)-1e9)
+    if (addend > (int)1e9 || addend < (int)-1e9)
         return "单次余额改变量不能超过1000000000";
 
     QString username = verify(token);
