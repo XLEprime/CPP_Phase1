@@ -32,9 +32,9 @@ const QString &Database::getPrimaryKeyByTableName(const QString &tableName)
         return id;
 }
 
-Database::Database(const QString &connectionName, const QString &fileName)
+Database::Database(const QString &connectionName, const QString &fileName) : userFile(fileName), usernameSet()
 {
-    db = QSqlDatabase::addDatabase("QMYSQL", connectionName);
+    db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
     db.setDatabaseName("MyDataBase.db");
     db.open();
 
@@ -153,21 +153,22 @@ bool Database::queryUserByName(const QString &username) const
     sqlQuery.bindValue(":username", username);
 
     exec(sqlQuery);
-    if (!sqlQuery.exec())
+    if (sqlQuery.exec())
     {
-        qCritical() << "数据库:查找user " << username << " 失败" << sqlQuery.lastError();
+        qDebug() << "数据库:查找user " << username << " 成功";
+        if (sqlQuery.next())
+        {
+            if (usernameSet.find(username) != usernameSet.constEnd())
+                qDebug() << "文件中查找到用户 " << username;
+            else
+                qFatal("数据库和文件不同步");
+            return true;
+        }
         return false;
     }
     else
     {
-        qDebug() << "数据库:查找user " << username << " 成功";
-        if (sqlQuery.next() && usernameSet.find(username) != usernameSet.constEnd())
-        {
-            qDebug() << "文件中查找到用户"
-                     << "username";
-            return true;
-        }
-        qFatal("数据库和文件不同步");
+        qCritical() << "数据库:查找user " << username << " 失败" << sqlQuery.lastError();
         return false;
     }
 }
