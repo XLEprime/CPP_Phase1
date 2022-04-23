@@ -301,7 +301,6 @@ QSharedPointer<Item> Database::query2Item(const QSqlQuery &sqlQuery) const
                                         sqlQuery.value(10).toString());
 }
 
-// int Database::queryItemByFilter(QList<QSharedPointer<Item>> &result, int id = -1, const Time &sendingTime = Time(-1, -1, -1), const Time &receivingTime = Time(-1, -1, -1), const QString &srcName = "", const QString &dstName = "") const
 int Database::queryItemByFilter(QList<QSharedPointer<Item>> &result, int id, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName) const
 {
     QSqlQuery sqlQuery(db);
