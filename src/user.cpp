@@ -87,61 +87,43 @@ QString UserManage::queryItem(const QJsonObject &token, const QJsonObject &filte
     QList<QSharedPointer<Item>> result;
     QString username = verify(token);
 
+    if (filter["type"].toInt() == 0 && userMap[username]->getUserType() != ADMINISTRATOR)
+        return "非管理员不能查看所有物品";
+
+    int id = -1;
+    Time sendingTime(-1, -1, -1), receivingTime(-1, -1, -1);
+    QString srcName(""), dstName("");
+    if (filter.contains("id"))
+        id = filter["id"].toInt();
+    if (filter.contains("sendingTime_Year"))
+        sendingTime.year = filter["sendingTime_Year"].toInt();
+    if (filter.contains("sendingTime_Month"))
+        sendingTime.month = filter["sendingTime_Month"].toInt();
+    if (filter.contains("sendingTime_Day"))
+        sendingTime.day = filter["sendingTime_Day"].toInt();
+    if (filter.contains("receivingTime_Year"))
+        receivingTime.year = filter["receivingTime_Year"].toInt();
+    if (filter.contains("receivingTime_Month"))
+        receivingTime.month = filter["receivingTime_Month"].toInt();
+    if (filter.contains("receivingTime_Day"))
+        receivingTime.day = filter["receivingTime_Day"].toInt();
+    if (filter.contains("srcName"))
+        srcName = filter["srcName"].toString();
+    if (filter.contains("dstName"))
+        dstName = filter["dstName"].toString();
+
     switch (filter["type"].toInt())
     {
     case 0:
-        if (userMap[username]->getUserType() != ADMINISTRATOR)
-            return "非管理员不能查看所有物品";
-        cnt = itemManage->queryAll(result);
+
+        cnt = itemManage->queryByFilter(result, id, sendingTime, receivingTime, srcName, dstName);
         break;
     case 1:
-    {
-        int id = -1;
-        Time sendingTime(-1, -1, -1), receivingTime(-1, -1, -1);
-        QString dstName("");
-        if (filter.contains("id"))
-            id = filter["id"].toInt();
-        if (filter.contains("sendingTime_Year"))
-            sendingTime.year = filter["sendingTime_Year"].toInt();
-        if (filter.contains("sendingTime_Month"))
-            sendingTime.month = filter["sendingTime_Month"].toInt();
-        if (filter.contains("sendingTime_Day"))
-            sendingTime.day = filter["sendingTime_Day"].toInt();
-        if (filter.contains("receivingTime_Year"))
-            receivingTime.year = filter["receivingTime_Year"].toInt();
-        if (filter.contains("receivingTime_Month"))
-            receivingTime.month = filter["receivingTime_Month"].toInt();
-        if (filter.contains("receivingTime_Day"))
-            receivingTime.day = filter["receivingTime_Day"].toInt();
-        if (filter.contains("dstName"))
-            dstName = filter["dstName"].toString();
         cnt = itemManage->queryByFilter(result, id, sendingTime, receivingTime, username, dstName);
-    }
-    break;
+        break;
     case 2:
-    {
-        int id = -1;
-        Time sendingTime(-1, -1, -1), receivingTime(-1, -1, -1);
-        QString srcName("");
-        if (filter.contains("id"))
-            id = filter["id"].toInt();
-        if (filter.contains("sendingTime_Year"))
-            sendingTime.year = filter["sendingTime_Year"].toInt();
-        if (filter.contains("sendingTime_Month"))
-            sendingTime.month = filter["sendingTime_Month"].toInt();
-        if (filter.contains("sendingTime_Day"))
-            sendingTime.day = filter["sendingTime_Day"].toInt();
-        if (filter.contains("receivingTime_Year"))
-            receivingTime.year = filter["receivingTime_Year"].toInt();
-        if (filter.contains("receivingTime_Month"))
-            receivingTime.month = filter["receivingTime_Month"].toInt();
-        if (filter.contains("receivingTime_Day"))
-            receivingTime.day = filter["receivingTime_Day"].toInt();
-        if (filter.contains("srcName"))
-            srcName = filter["srcName"].toString();
         cnt = itemManage->queryByFilter(result, id, sendingTime, receivingTime, srcName, username);
-    }
-    break;
+        break;
     default:
         return "type键的值有误";
         break;
@@ -247,5 +229,18 @@ QString UserManage::getTime(QJsonObject &ret) const
     ret.insert("year", timeManage->getCurYear());
     ret.insert("month", timeManage->getCurMonth());
     ret.insert("day", timeManage->getCurDay());
+    return {};
+}
+
+QString UserManage::addItem(const QJsonObject &token, const QJsonObject &info) const
+{
+    QString username = verify(token);
+    if (username.isEmpty())
+        return "验证失败";
+
+    if (!info.contains("dstName") || !info.contains("description") || !info.contains("sendingTime_Year") || !info.contains("sendingTime_Month") || !info.contains("sendingTime_Day"))
+        return "快递物品信息不全";
+    int id = itemManage->insertItem(15, PENDING_REVEICING, Time(info["sendingTime_Year"].toInt(), info["sendingTime_Month"].toInt(), info["sendingTime_Day"].toInt()), Time(-1, -1, -1), username, info["dstName"].toString(), info["description"].toString());
+    qDebug() << "添加快递单号为" << id;
     return {};
 }

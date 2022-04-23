@@ -49,6 +49,7 @@ public:
      * @note 注意是否使用std::move
      */
     Item(int _id,
+         int _cost,
          int _state,
          Time _sendingTime,
          Time _receivingTime,
@@ -56,7 +57,7 @@ public:
          QString _dstName,
          QString _description)
         : id(_id),
-          cost(15),
+          cost(_cost),
           state(_state),
           sendingTime(_sendingTime),
           receivingTime(_receivingTime),
@@ -153,10 +154,11 @@ public:
      * @param srcName 寄件用户的用户名
      * @param dstName 收件用户的用户名
      * @param description 物品描述
+     * @return int 为添加的快递分配的单号
      *
-     * @note pahse默认cost为15
+     * @note pahse1默认cost为15
      */
-    void insertItem(
+    int insertItem(
         const int cost,
         const int state,
         const Time &sendingTime,

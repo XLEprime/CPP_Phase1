@@ -265,10 +265,10 @@ int Database::getDBMaxId(const QString &tableName) const
 void Database::insertItem(int id, int cost, int state, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName, const QString &description)
 {
     QSqlQuery sqlQuery(db);
-    sqlQuery.prepare("INSERT INTO item VALUES(:id, :cost, :type, :state,"
+    sqlQuery.prepare("INSERT INTO item VALUES(:id, :cost, :state,"
                      " :sendingTime_Year, :sendingTime_Month, :sendingTime_Day,"
                      " :receivingTime_Year, :receivingTime_Month, :receivingTime_Day,"
-                     " :srcName, :dstName, :description)");
+                     " :srcName, :dstName, :description)"); // phase2开始添加type
     sqlQuery.bindValue(":id", id);
     sqlQuery.bindValue(":cost", cost);
     sqlQuery.bindValue(":state", state);
@@ -292,13 +292,9 @@ QSharedPointer<Item> Database::query2Item(const QSqlQuery &sqlQuery) const
 {
     Time sendingTime{sqlQuery.value(3).toInt(), sqlQuery.value(4).toInt(), sqlQuery.value(5).toInt()};
     Time receivingTime{sqlQuery.value(6).toInt(), sqlQuery.value(7).toInt(), sqlQuery.value(8).toInt()};
-    return QSharedPointer<Item>::create(sqlQuery.value(0).toInt(),
-                                        sqlQuery.value(1).toInt(),
-                                        sendingTime,
-                                        receivingTime,
-                                        sqlQuery.value(8).toString(),
-                                        sqlQuery.value(9).toString(),
-                                        sqlQuery.value(10).toString());
+    qDebug() << "创建Item对象"
+             << "id" << sqlQuery.value(0).toInt() << "状态" << sqlQuery.value(2).toInt() << "描述" << sqlQuery.value(11).toString();
+    return QSharedPointer<Item>::create(sqlQuery.value(0).toInt(), sqlQuery.value(1).toInt(), sqlQuery.value(2).toInt(), sendingTime, receivingTime, sqlQuery.value(9).toString(), sqlQuery.value(10).toString(), sqlQuery.value(11).toString());
 }
 
 int Database::queryItemByFilter(QList<QSharedPointer<Item>> &result, int id, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName) const
@@ -352,7 +348,7 @@ int Database::queryItemByFilter(QList<QSharedPointer<Item>> &result, int id, con
         sqlQuery.bindValue(":receivingTime_day", receivingTime.day);
     }
     if (!srcName.isEmpty())
-        sqlQuery.bindValue(":srcName", dstName);
+        sqlQuery.bindValue(":srcName", srcName);
     if (!dstName.isEmpty())
         sqlQuery.bindValue(":dstName", dstName);
 
@@ -364,14 +360,13 @@ int Database::queryItemByFilter(QList<QSharedPointer<Item>> &result, int id, con
     }
     else
     {
-        qDebug() << "数据库:查找物品成功";
         int cnt = 0;
         while (sqlQuery.next())
         {
-            result.append(query2Item(sqlQuery));
+            result.append(query2Item(sqlQuery));//将查找结果转换为临时Item对象
             cnt++;
-            return true;
         }
+        qDebug() << "数据库:查找物品成功，共" << cnt << "条";
         return cnt;
     }
 }

@@ -12,7 +12,7 @@
 #include "../include/item.h"
 #include "../include/database.h"
 
-void ItemManage::insertItem(
+int ItemManage::insertItem(
     const int cost,
     const int state,
     const Time &sendingTime,
@@ -22,7 +22,8 @@ void ItemManage::insertItem(
     const QString &description)
 {
     qDebug() << "添加物品 ";
-    db->insertItem(++total, 15, state, sendingTime, receivingTime, srcName, dstName, description);
+    db->insertItem(++total, cost, state, sendingTime, receivingTime, srcName, dstName, description);
+    return total;
 }
 
 int ItemManage::queryAll(QList<QSharedPointer<Item>> &result) const

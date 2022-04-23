@@ -194,7 +194,7 @@ public:
 
     /**
      * @brief 按照条件查询商品，条件以Json给出。
-     * @param 用户鉴权
+     * @param woken 用户鉴权
      * @param filter 条件
      * @param ret 查询结果
      * @return QString 查询成功则返回空串，否则返回错误信息
@@ -262,7 +262,23 @@ public:
      */
     QString getTime(QJsonObject &ret) const;
 
-    // todo 增加物品 修改物品 删除物品
+    /**
+     * @brief 发送快递物品
+     * @param token 凭据
+     * @param info 快递物品信息
+     * @return QString
+     * @note 查询格式有:
+     * ```json
+     * {
+     *      "sendingTime_Year" : <整数>,
+     *      "sendingTime_Month" : <整数>,
+     *      "sendingTime_Day" : <整数>,
+     *      "dstName" : <字符串>
+     *      "description" : <字符串>
+     * }
+     */
+    QString addItem(const QJsonObject &token, const QJsonObject &info) const;
+    // todo 删除物品
 
 private:
     QMap<QString, QSharedPointer<User>> userMap; //用户名到用户对象的映射.
