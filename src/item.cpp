@@ -34,12 +34,12 @@ int ItemManage::queryAll(QList<QSharedPointer<Item>> &result) const
 
 int ItemManage::queryByFilter(QList<QSharedPointer<Item>> &result, int id, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName) const
 {
-    qDebug() << "按条件查询 ";
+    qDebug() << "按条件查询";
     return db->queryItemByFilter(result, id, sendingTime, receivingTime, srcName, dstName);
 }
 
 void ItemManage::deleteItem(int id) const
 {
-    qDebug() << "按条件查询 ";
+    qDebug() << "删除id为" << id << "的物品";
     db->deleteItem(id);
 }

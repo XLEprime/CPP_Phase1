@@ -293,7 +293,7 @@ QSharedPointer<Item> Database::query2Item(const QSqlQuery &sqlQuery) const
     Time sendingTime{sqlQuery.value(3).toInt(), sqlQuery.value(4).toInt(), sqlQuery.value(5).toInt()};
     Time receivingTime{sqlQuery.value(6).toInt(), sqlQuery.value(7).toInt(), sqlQuery.value(8).toInt()};
     qDebug() << "创建Item对象"
-             << "id" << sqlQuery.value(0).toInt() << "状态" << sqlQuery.value(2).toInt() << "描述" << sqlQuery.value(11).toString();
+             << "id" << sqlQuery.value(0).toInt() << "状态" << sqlQuery.value(2).toInt() << "接收时间" << sqlQuery.value(11).toString();
     return QSharedPointer<Item>::create(sqlQuery.value(0).toInt(), sqlQuery.value(1).toInt(), sqlQuery.value(2).toInt(), sendingTime, receivingTime, sqlQuery.value(9).toString(), sqlQuery.value(10).toString(), sqlQuery.value(11).toString());
 }
 
@@ -363,7 +363,7 @@ int Database::queryItemByFilter(QList<QSharedPointer<Item>> &result, int id, con
         int cnt = 0;
         while (sqlQuery.next())
         {
-            result.append(query2Item(sqlQuery));//将查找结果转换为临时Item对象
+            result.append(query2Item(sqlQuery)); //将查找结果转换为临时Item对象
             cnt++;
         }
         qDebug() << "数据库:查找物品成功，共" << cnt << "条";
