@@ -86,9 +86,7 @@ int main()
             QJsonObject retInfo;
             QString ret = userManage.getTime(retInfo);
             if (ret.isEmpty())
-            {
                 qInfo() << "查询物流系统时间成功，当前时间为" << retInfo["year"].toInt() << "/" << retInfo["month"].toInt() << "/" << retInfo["day"].toInt();
-            }
         }
         else if (args[0] == "addtime" && args.size() == 2 && args[1].toInt(&ok) && ok)
         {
