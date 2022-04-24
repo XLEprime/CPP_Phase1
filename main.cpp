@@ -82,6 +82,7 @@ int main()
             qInfo() << "查找将收到的符合条件的快递: querysrc <物品单号> <寄送时间年> <寄送时间月> <寄送时间日> <接收时间年> <接收时间月> <接收时间日> <寄件用户的用户名>";
             qInfo() << "    若要查询所有符合该条件的物品，则该条件用*代替。";
             qInfo() << "发送快递: send <寄送时间年> <寄送时间月> <寄送时间日> <收件用户的用户名> <描述>";
+            qInfo() << "接收快递: receive <物品单号>";
         }
         else if (args[0] == "time" && args.size() == 1)
         {
@@ -137,7 +138,8 @@ int main()
             if (ret.isEmpty())
                 qInfo() << "已登出";
             else
-                qInfo() << "登出失败";
+                qInfo() << "登出失败" << ret;
+            token = QJsonValue(QJsonValue::Null);
         }
         else if (args[0] == "changepassword" && args.size() == 2)
         {
@@ -341,6 +343,21 @@ int main()
                 qInfo() << "物品添加成功";
             else
                 qInfo() << "物品添加失败" << ret;
+        }
+        else if (args[0] == "receive" && args.size() == 2 && args[1].toInt(&ok) && ok)
+        {
+            if (token.isNull())
+            {
+                qInfo() << "当前没有用户登录，请登录后重试。";
+                continue;
+            }
+            QJsonObject info;
+            info.insert("id", args[1].toInt());
+            QString ret = userManage.receiveItem(token.toObject(), info);
+            if (ret.isEmpty())
+                qInfo() << "物品接收成功";
+            else
+                qInfo() << "物品接收失败" << ret;
         }
         else
             qInfo() << "指令输入有误，请输入help查看帮助";

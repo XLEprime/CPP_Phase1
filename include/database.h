@@ -83,16 +83,20 @@ public:
      *
      * @param username 用户名
      * @param password 新密码
+     * @return true 修改成功
+     * @return false 修改失败
      */
-    void modifyUserPassword(const QString &username, const QString &password) const;
+    bool modifyUserPassword(const QString &username, const QString &password) const;
 
     /**
      * @brief 修改用户余额
      *
      * @param username 用户名
      * @param balance 改后的余额
+     * @return true 修改成功
+     * @return false 修改失败
      */
-    void modifyUserBalance(const QString &username, int balance) const;
+    bool modifyUserBalance(const QString &username, int balance) const;
 
     /**
      * @brief 查询表中主键的最大值
@@ -135,10 +139,30 @@ public:
     int queryItemByFilter(QList<QSharedPointer<Item>> &result, int id, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName) const;
 
     /**
+     * @brief 修改物品状态
+     * @param id 物品单号
+     * @param state 物品状态
+     * @return true 修改成功
+     * @return false 修改失败
+     */
+    bool modifyItemState(const int id, const int state);
+
+    /**
+     * @brief 修改物品接收时间
+     * @param id 物品单号
+     * @param receivingTime 接收时间
+     * @return true 修改成功
+     * @return false 修改失败
+     */
+    bool modifyItemReceivingTime(const int id, const Time receivingTime);
+
+    /**
      * @brief 删除物品
      * @param id 物品单号
+     * @return true 删除成功
+     * @return false 删除失败
      */
-    void deleteItem(int id) const;
+    bool deleteItem(const int id) const;
 
 private:
     QSqlDatabase db;           // SQLite数据库
@@ -167,8 +191,10 @@ private:
      * @param primaryKey 需要修改的记录的主键
      * @param key 需要修改的键
      * @param value 修改的值
+     * @return true 修改成功
+     * @return false 修改失败
      */
-    void modifyData(const QString &tableName, const QString &primaryKey, const QString &key, int value) const;
+    bool modifyData(const QString &tableName, const QString &primaryKey, const QString &key, int value) const;
 
     /**
      * @brief 修改数据库中某个记录的值，值为QString类型，对应数据库的TEXT类型。
@@ -176,8 +202,10 @@ private:
      * @param primaryKey 需要修改的记录的主键
      * @param key 需要修改的键
      * @param value 修改的值
+     * @return true 修改成功
+     * @return false 修改失败
      */
-    void modifyData(const QString &tableName, const QString &primaryKey, const QString &key, const QString value) const;
+    bool modifyData(const QString &tableName, const QString &primaryKey, const QString &key, const QString value) const;
 };
 
 #endif

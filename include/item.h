@@ -184,13 +184,35 @@ public:
      * @param dstName 收件用户的用户名
      * @return int 查到符合条件的数量
      */
-    int queryByFilter(QList<QSharedPointer<Item>> &result, int id = -1, const Time &sendingTime = Time(-1, -1, -1), const Time &receivingTime = Time(-1, -1, -1), const QString &srcName = "", const QString &dstName = "") const;
+    int queryByFilter(QList<QSharedPointer<Item>> &result, const int id = -1, const Time &sendingTime = Time(-1, -1, -1), const Time &receivingTime = Time(-1, -1, -1), const QString &srcName = "", const QString &dstName = "") const;
+
+    /**
+     * @brief 根据条件查询物品
+     * @param result 用于返回结果
+     * @param id 物品单号
+     * @return true 存在该物品
+     * @return false 不存在该物品
+     */
+    bool queryById(QSharedPointer<Item> &result, const int id) const;
+
+    /**
+     * @brief 修改物品状态
+     * @param id 物品单号
+     * @param state 物品状态
+     * @return true 修改成功
+     * @return false 修改失败
+     */
+    bool modifyState(const int id, const int state);
+
+    bool modifyReceivingTime(const int id,const Time &receivingTime);
 
     /**
      * @brief 从数据库中删除对应id的物品
      * @param id 物品单号
+     * @return true 修改成功
+     * @return false 修改失败
      */
-    void deleteItem(int id) const;
+    bool deleteItem(const int id) const;
 
 private:
     Database *db; //数据库

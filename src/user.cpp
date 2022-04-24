@@ -115,7 +115,6 @@ QString UserManage::queryItem(const QJsonObject &token, const QJsonObject &filte
     switch (filter["type"].toInt())
     {
     case 0:
-
         cnt = itemManage->queryByFilter(result, id, sendingTime, receivingTime, srcName, dstName);
         break;
     case 1:
@@ -237,5 +236,27 @@ QString UserManage::addItem(const QJsonObject &token, const QJsonObject &info) c
         return {"寄送时间必须是今天或未来"};
     int id = itemManage->insertItem(15, PENDING_REVEICING, sendingTime, Time(-1, -1, -1), username, info["dstName"].toString(), info["description"].toString());
     qDebug() << "添加快递单号为" << id;
+    return {};
+}
+
+QString UserManage::receiveItem(const QJsonObject &token, const QJsonObject &info) const
+{
+    QString username = verify(token);
+    if (username.isEmpty())
+        return "验证失败";
+
+    if (!info.contains("id"))
+        return "快递物品信息不全";
+
+    QSharedPointer<Item> result;
+    if (!itemManage->queryById(result, info["id"].toInt()))
+        return "不存在运单号为该ID的物品";
+    if (result->getDstName() != username)
+        return "这不是您的快递";
+    if (!result->getSendingTime().isDue())
+        return {"该快递还未到达"};
+
+    itemManage->modifyState(info["id"].toInt(), RECEIVED);
+    itemManage->modifyReceivingTime(info["id"].toInt(), Time(Time::getCurYear(), Time::getCurMonth(), Time::getCurDay()));
     return {};
 }

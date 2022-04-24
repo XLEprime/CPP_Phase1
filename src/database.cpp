@@ -94,7 +94,7 @@ Database::Database(const QString &connectionName, const QString &fileName) : use
     }
 }
 
-void Database::modifyData(const QString &tableName, const QString &primaryKey, const QString &key, int value) const
+bool Database::modifyData(const QString &tableName, const QString &primaryKey, const QString &key, int value) const
 {
     QSqlQuery sqlQuery(db);
     sqlQuery.prepare("UPDATE " + tableName + " SET " + key + " = :value WHERE " + getPrimaryKeyByTableName(tableName) + " = :primaryKey");
@@ -102,17 +102,23 @@ void Database::modifyData(const QString &tableName, const QString &primaryKey, c
     sqlQuery.bindValue(":primaryKey", primaryKey);
 
     exec(sqlQuery);
-    if (!sqlQuery.exec())
-        qCritical() << "数据库: " << key << " : "
-                    << value
-                    << " 修改失败" << sqlQuery.lastError();
-    else
+    if (sqlQuery.exec())
+    {
         qDebug() << "数据库: " << key << " : "
                  << value
                  << " 修改成功";
+        return true;
+    }
+    else
+    {
+        qCritical() << "数据库: " << key << " : "
+                    << value
+                    << " 修改失败" << sqlQuery.lastError();
+        return false;
+    }
 }
 
-void Database::modifyData(const QString &tableName, const QString &primaryKey, const QString &key, const QString value) const
+bool Database::modifyData(const QString &tableName, const QString &primaryKey, const QString &key, const QString value) const
 {
     QSqlQuery sqlQuery(db);
     sqlQuery.prepare("UPDATE " + tableName + " SET " + key + " = :value WHERE " + getPrimaryKeyByTableName(tableName) + " = :primaryKey");
@@ -120,14 +126,20 @@ void Database::modifyData(const QString &tableName, const QString &primaryKey, c
     sqlQuery.bindValue(":primaryKey", primaryKey);
 
     exec(sqlQuery);
-    if (!sqlQuery.exec())
-        qCritical() << "数据库: " << key << " : "
-                    << value
-                    << " 修改失败" << sqlQuery.lastError();
-    else
+    if (sqlQuery.exec())
+    {
         qDebug() << "数据库: " << key << " : "
                  << value
                  << " 修改成功";
+        return true;
+    }
+    else
+    {
+        qCritical() << "数据库: " << key << " : "
+                    << value
+                    << " 修改失败" << sqlQuery.lastError();
+        return false;
+    }
 }
 
 void Database::insertUser(const QString &username, const QString &password, bool type, int balance)
@@ -232,14 +244,14 @@ int Database::queryBalanceByName(const QString &username) const
     }
 }
 
-void Database::modifyUserPassword(const QString &username, const QString &password) const
+bool Database::modifyUserPassword(const QString &username, const QString &password) const
 {
-    modifyData("user", username, "password", password);
+    return modifyData("user", username, "password", password);
 }
 
-void Database::modifyUserBalance(const QString &username, int balance) const
+bool Database::modifyUserBalance(const QString &username, int balance) const
 {
-    modifyData("user", username, "balance", balance);
+    return modifyData("user", username, "balance", balance);
 }
 
 int Database::getDBMaxId(const QString &tableName) const
@@ -371,14 +383,34 @@ int Database::queryItemByFilter(QList<QSharedPointer<Item>> &result, int id, con
     }
 }
 
-void Database::deleteItem(int id) const
+bool Database::modifyItemState(const int id, const int state)
+{
+    return modifyData("item", QString::number(id), "state", state);
+}
+
+bool Database::modifyItemReceivingTime(const int id, const Time receivingTime)
+{
+    bool flag1 = false, flag2 = false, flag3 = false;
+    flag1 = modifyData("item", QString::number(id), "receivingTime_Year", receivingTime.year);
+    flag2 = modifyData("item", QString::number(id), "receivingTime_Month", receivingTime.month);
+    flag2 = modifyData("item", QString::number(id), "receivingTime_Day", receivingTime.day);
+    return flag1 && flag2 && flag3;
+}
+
+bool Database::deleteItem(const int id) const
 {
     QSqlQuery sqlQuery(db);
     sqlQuery.prepare("DELETE FROM item WHERE id = :id");
     sqlQuery.bindValue(":id", id);
     exec(sqlQuery);
     if (!sqlQuery.exec())
+    {
         qCritical() << "数据库删除id为 " << id << " 的项失败";
+        return true;
+    }
     else
+    {
         qDebug() << "数据库删除id为 " << id << " 的项成功";
+        return false;
+    }
 }

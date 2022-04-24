@@ -25,6 +25,8 @@
 
 const int CUSTOMER = 0;
 const int ADMINISTRATOR = 1;
+extern const int RECEIVED;          //已签收
+extern const int PENDING_REVEICING; //待签收
 
 /**
  * @brief 用户基类
@@ -245,7 +247,7 @@ public:
      * @param token 凭据
      * @param info 快递物品信息
      * @return QString
-     * @note 查询格式有:
+     * @note 物品信息格式:
      * ```json
      * {
      *      "sendingTime_Year" : <整数>,
@@ -256,7 +258,19 @@ public:
      * }
      */
     QString addItem(const QJsonObject &token, const QJsonObject &info) const;
-    // todo 删除物品
+
+    /**
+     * @brief 发送快递物品
+     * @param token 凭据
+     * @param info 快递物品信息
+     * @return QString
+     * @note 物品信息格式:
+     * ```json
+     * {
+     *      "id" : <整数>
+     * }
+     */
+    QString receiveItem(const QJsonObject &token, const QJsonObject &info) const;
 
 private:
     QMap<QString, QSharedPointer<User>> userMap; //用户名到用户对象的映射.
