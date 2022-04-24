@@ -217,6 +217,28 @@ QString UserManage::getUserInfo(const QJsonObject &token, QJsonObject &ret) cons
     return {};
 }
 
+QString UserManage::queryAllUserInfo(const QJsonObject &token, QJsonArray &ret) const
+{
+    QString username = verify(token);
+    if (username.isEmpty())
+        return "验证失败";
+    if (userMap[username]->getUserType() != ADMINISTRATOR)
+        return "非管理员不能查看所有用户信息";
+    for (QString i : db->usernameSet)
+    {
+        QString retPassword;
+        int retType;
+        int retBalance;
+        db->queryUserByName(i, retPassword, retType, retBalance);
+        QJsonObject itemJson;
+        itemJson.insert("username", i);
+        itemJson.insert("type", retType);
+        itemJson.insert("balance", retBalance);
+        ret.append(itemJson);
+    }
+    return {};
+}
+
 QString UserManage::addItem(const QJsonObject &token, const QJsonObject &info) const
 {
     QString username = verify(token);

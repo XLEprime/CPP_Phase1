@@ -22,7 +22,7 @@
 
 class Item;
 class Time;
-
+class User;
 
 const int CUSTOMER = 0;
 const int ADMINISTRATOR = 1;
@@ -32,6 +32,8 @@ const int ADMINISTRATOR = 1;
 class Database
 {
 public:
+    QSet<QString> usernameSet; //用户名集合
+
     /**
      * @brief 删除默认构造函数
      */
@@ -123,9 +125,9 @@ public:
     void insertItem(int id, int cost, int state, const Time &sendingTime, const Time &receivingTime, const QString &srcName, const QString &dstName, const QString &description);
 
     /**
-     * @brief 将数据库的物品查询结果转换成指针
-     * @param sqlQuery 物品类的查询结果
-     * @return QSharedPointer<Item> 一个指向新创建的物品类的指针
+     * @brief 将数据库的Item查询结果转换成指向Item的指针
+     * @param sqlQuery Item类的查询结果
+     * @return QSharedPointer<Item> 一个指向新创建的Item类的指针
      */
     QSharedPointer<Item> query2Item(const QSqlQuery &sqlQuery) const;
 
@@ -168,10 +170,9 @@ public:
     bool deleteItem(const int id) const;
 
 private:
-    QSqlDatabase db;           // SQLite数据库
-    QFile userFile;            //永久存储用户名文件
-    QTextStream stream;        //用户读写用户名的stream
-    QSet<QString> usernameSet; //用户名集合
+    QSqlDatabase db;    // SQLite数据库
+    QFile userFile;     //永久存储用户名文件
+    QTextStream stream; //用户读写用户名的stream
 
     /**
      * @brief 执行SQL语句

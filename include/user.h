@@ -182,6 +182,23 @@ public:
     QString getUserInfo(const QJsonObject &token, QJsonObject &ret) const;
 
     /**
+     * @brief 获取用户信息
+     * @param token 凭据
+     * @param ret 用户信息数组
+     * @return 如果获取成功，返回空串，否则返回错误信息
+     *
+     * 用户信息的格式：
+     * ```json
+     * {
+     *    "username": <字符串>,
+     *    "type": <整数>,
+     *    "balance": <整数>
+     * }
+     * ```
+     */
+    QString queryAllUserInfo(const QJsonObject &token, QJsonArray &ret) const;
+
+    /**
      * @brief 更改余额(单用户)
      * @param token 凭据
      * @param addend 余额增量

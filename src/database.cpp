@@ -309,8 +309,6 @@ QSharedPointer<Item> Database::query2Item(const QSqlQuery &sqlQuery) const
 {
     Time sendingTime{sqlQuery.value(3).toInt(), sqlQuery.value(4).toInt(), sqlQuery.value(5).toInt()};
     Time receivingTime{sqlQuery.value(6).toInt(), sqlQuery.value(7).toInt(), sqlQuery.value(8).toInt()};
-    // qDebug() << "创建Item对象"
-    //  << "id" << sqlQuery.value(0).toInt() << "状态" << sqlQuery.value(2).toInt() << "接收时间" << sqlQuery.value(11).toString();
     return QSharedPointer<Item>::create(sqlQuery.value(0).toInt(), sqlQuery.value(1).toInt(), sqlQuery.value(2).toInt(), sendingTime, receivingTime, sqlQuery.value(9).toString(), sqlQuery.value(10).toString(), sqlQuery.value(11).toString());
 }
 

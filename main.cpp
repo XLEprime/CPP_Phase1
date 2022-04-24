@@ -72,6 +72,8 @@ int main()
             qInfo() << "登出: logout";
             qInfo() << "修改密码: changepassword <新密码>";
             qInfo() << "查看个人信息: info";
+            qInfo() << "查看所有用户信息: alluserinfo";
+            qInfo() << "    注意此功能仅限管理员使用。";
             qInfo() << "充值: addbalance <增加量>";
             qInfo() << "查询所有快递: queryallitem";
             qInfo() << "    注意此功能仅限管理员使用。";
@@ -167,6 +169,27 @@ int main()
             {
                 qInfo() << "查询用户信息成功 用户名为 " << retInfo["username"].toString() << " 类型为 " << userType[retInfo["type"].toInt()] << " 余额为 " << retInfo["balance"].toInt();
             }
+        }
+        else if (args[0] == "alluserinfo" && args.size() == 1)
+        {
+            if (token.isNull())
+            {
+                qInfo() << "当前没有用户登录，请登录后重试。";
+                continue;
+            }
+            QJsonArray queryRet;
+            QString ret = userManage.queryAllUserInfo(token.toObject(), queryRet);
+            if (ret.isEmpty())
+            {
+                qInfo() << "查询成功";
+                for (const auto &i : queryRet)
+                {
+                    QJsonObject user = i.toObject();
+                    qInfo() << "用户名 " << user["username"].toString() << " 类型为 " << userType[user["type"].toInt()] << " 余额为 " << user["balance"].toInt();
+                }
+            }
+            else
+                qInfo() << "查询失败" << ret;
         }
         else if (args[0] == "addbalance" && args.size() == 2)
         {
