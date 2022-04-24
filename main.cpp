@@ -73,14 +73,14 @@ int main()
             qInfo() << "修改密码: changepassword <新密码>";
             qInfo() << "查看个人信息: info";
             qInfo() << "充值: addbalance <增加量>";
-            qInfo() << "查询所有快递: queryall";
+            qInfo() << "查询所有快递: queryallitem";
             qInfo() << "    注意此功能仅限管理员使用。";
             qInfo() << "查询所有符合条件的快递: query <物品单号> <寄送时间年> <寄送时间月> <寄送时间日> <接收时间年> <接收时间月> <接收时间日> <寄件用户的用户名> <收件用户的用户名>";
             qInfo() << "    若要查询所有符合该条件的物品，则该条件用*代替。注意此功能仅限管理员使用。";
             qInfo() << "查找发出的符合条件的快递: querysrc <物品单号> <寄送时间年> <寄送时间月> <寄送时间日> <接收时间年> <接收时间月> <接收时间日> <收件用户的用户名>";
-            qInfo() << "    若要查询所有符合该条件的物品，则该条件用*代替。";
+            qInfo() << "    若要查询所有符合该条件的物品，则该条件用*代替。若要查询全部，可以只输入querysrc。";
             qInfo() << "查找将收到的符合条件的快递: querysrc <物品单号> <寄送时间年> <寄送时间月> <寄送时间日> <接收时间年> <接收时间月> <接收时间日> <寄件用户的用户名>";
-            qInfo() << "    若要查询所有符合该条件的物品，则该条件用*代替。";
+            qInfo() << "    若要查询所有符合该条件的物品，则该条件用*代替。若要查询全部，可以只输入querydst。";
             qInfo() << "发送快递: send <寄送时间年> <寄送时间月> <寄送时间日> <收件用户的用户名> <描述>";
             qInfo() << "接收快递: receive <物品单号>";
         }
@@ -186,7 +186,7 @@ int main()
             else
                 qInfo() << "余额充值失败 " << ret;
         }
-        else if (args[0] == "queryall" && args.size() == 1)
+        else if (args[0] == "queryallitem" && args.size() == 1)
         {
             if (token.isNull())
             {
@@ -201,9 +201,9 @@ int main()
                 for (const auto &i : queryRet)
                 {
                     QJsonObject item = i.toObject();
-                    qInfo() << "物品单号为 " << item["id"] << " 花费为 " << item["cost"] << " 状态为 " << item["state"] << " 寄送时间为 " << item["sendingTime_Year"] << "年" << item["sendingTime_Month"] << "月" << item["sendingTime_Day"] << "日"
-                            << " 接收时间为 " << item["recevingTime_Year"] << "年" << item["recevingTime_Month"] << "月" << item["recevingTime_Day"] << "日"
-                            << " 寄件人为 " << item["srcName"] << "收件人为" << item["dstName"];
+                    qInfo() << "物品单号为 " << item["id"].toInt() << " 花费为 " << item["cost"].toInt() << " 状态为 " << itemState[item["state"].toInt()] << " 寄送时间为 " << item["sendingTime_Year"].toInt() << "/" << item["sendingTime_Month"].toInt() << "/" << item["sendingTime_Day"].toInt()
+                            << " 接收时间为 " << item["receivingTime_Year"].toInt() << "/" << item["receivingTime_Month"].toInt() << "/" << item["receivingTime_Day"].toInt() << "/"
+                            << " 寄件人为 " << item["srcName"].toString() << "收件人为" << item["dstName"].toString() << "描述为" << item["description"].toString();
                 }
             else
                 qInfo() << "查询失败" << ret;
@@ -286,6 +286,28 @@ int main()
             else
                 qInfo() << "查询失败" << ret;
         }
+        else if (args[0] == "querysrc" && args.size() == 1)
+        {
+            if (token.isNull())
+            {
+                qInfo() << "当前没有用户登录，请登录后重试。";
+                continue;
+            }
+            QJsonObject filter;
+            filter.insert("type", 1);
+            QJsonArray queryRet;
+            QString ret = userManage.queryItem(token.toObject(), filter, queryRet);
+            if (ret.isEmpty())
+                for (const auto &i : queryRet)
+                {
+                    QJsonObject item = i.toObject();
+                    qInfo() << "物品单号为 " << item["id"].toInt() << " 花费为 " << item["cost"].toInt() << " 状态为 " << itemState[item["state"].toInt()] << " 寄送时间为 " << item["sendingTime_Year"].toInt() << "/" << item["sendingTime_Month"].toInt() << "/" << item["sendingTime_Day"].toInt()
+                            << " 接收时间为 " << item["receivingTime_Year"].toInt() << "/" << item["receivingTime_Month"].toInt() << "/" << item["receivingTime_Day"].toInt() << "/"
+                            << " 寄件人为 " << item["srcName"].toString() << "收件人为" << item["dstName"].toString() << "描述为" << item["description"].toString();
+                }
+            else
+                qInfo() << "查询失败" << ret;
+        }
         else if (args[0] == "querydst" && args.size() == 9 && ((args[1] == '*') || args[1].toInt(&ok) && ok) && ((args[2] == '*') || args[2].toInt(&ok) && ok) && ((args[3] == '*') || args[3].toInt(&ok) && ok) && ((args[4] == '*') || args[4].toInt(&ok) && ok) && ((args[5] == '*') || args[5].toInt(&ok) && ok) && ((args[6] == '*') || args[6].toInt(&ok) && ok) && ((args[7] == '*') || args[7].toInt(&ok) && ok))
         {
             if (token.isNull())
@@ -311,6 +333,28 @@ int main()
                 filter.insert("receivingTime_Day", args[7].toInt());
             if (args[8] != "*")
                 filter.insert("srcName", args[8]);
+            QJsonArray queryRet;
+            QString ret = userManage.queryItem(token.toObject(), filter, queryRet);
+            if (ret.isEmpty())
+                for (const auto &i : queryRet)
+                {
+                    QJsonObject item = i.toObject();
+                    qInfo() << "物品单号为 " << item["id"].toInt() << " 花费为 " << item["cost"].toInt() << " 状态为 " << itemState[item["state"].toInt()] << " 寄送时间为 " << item["sendingTime_Year"].toInt() << "/" << item["sendingTime_Month"].toInt() << "/" << item["sendingTime_Day"].toInt()
+                            << " 接收时间为 " << item["receivingTime_Year"].toInt() << "/" << item["receivingTime_Month"].toInt() << "/" << item["receivingTime_Day"].toInt() << "/"
+                            << " 寄件人为 " << item["srcName"].toString() << "收件人为" << item["dstName"].toString() << "描述为" << item["description"].toString();
+                }
+            else
+                qInfo() << "查询失败" << ret;
+        }
+        else if (args[0] == "querydst" && args.size() == 1)
+        {
+            if (token.isNull())
+            {
+                qInfo() << "当前没有用户登录，请登录后重试。";
+                continue;
+            }
+            QJsonObject filter;
+            filter.insert("type", 2);
             QJsonArray queryRet;
             QString ret = userManage.queryItem(token.toObject(), filter, queryRet);
             if (ret.isEmpty())

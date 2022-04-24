@@ -86,12 +86,17 @@ Database::Database(const QString &connectionName, const QString &fileName) : use
         qCritical() << "user文件打开失败";
         exit(1);
     }
+    bool isAdministratorExist = false;
     stream.setDevice(&userFile);
     while (!stream.atEnd())
     {
         QString line = stream.readLine();
         usernameSet.insert(line);
+        if (line == "ADMINISTRATOR")
+            isAdministratorExist = true;
     }
+    if (!isAdministratorExist)
+        insertUser("ADMINISTRATOR", "123", ADMINISTRATOR, 0);
 }
 
 bool Database::modifyData(const QString &tableName, const QString &primaryKey, const QString &key, int value) const
@@ -142,7 +147,7 @@ bool Database::modifyData(const QString &tableName, const QString &primaryKey, c
     }
 }
 
-void Database::insertUser(const QString &username, const QString &password, bool type, int balance)
+void Database::insertUser(const QString &username, const QString &password, int type, int balance)
 {
     QSqlQuery sqlQuery(db);
     sqlQuery.prepare("INSERT INTO user VALUES(:username, :password, :type, :balance)");
@@ -184,7 +189,7 @@ bool Database::queryUserByName(const QString &username) const
     }
     else
     {
-        qCritical() << "数据库:查找user " << username << " 失败" << sqlQuery.lastError();
+        qCritical() << "数据库:没有username为" << username << "的记录" << sqlQuery.lastError();
         return false;
     }
 }
@@ -304,8 +309,8 @@ QSharedPointer<Item> Database::query2Item(const QSqlQuery &sqlQuery) const
 {
     Time sendingTime{sqlQuery.value(3).toInt(), sqlQuery.value(4).toInt(), sqlQuery.value(5).toInt()};
     Time receivingTime{sqlQuery.value(6).toInt(), sqlQuery.value(7).toInt(), sqlQuery.value(8).toInt()};
-    qDebug() << "创建Item对象"
-             << "id" << sqlQuery.value(0).toInt() << "状态" << sqlQuery.value(2).toInt() << "接收时间" << sqlQuery.value(11).toString();
+    // qDebug() << "创建Item对象"
+    //  << "id" << sqlQuery.value(0).toInt() << "状态" << sqlQuery.value(2).toInt() << "接收时间" << sqlQuery.value(11).toString();
     return QSharedPointer<Item>::create(sqlQuery.value(0).toInt(), sqlQuery.value(1).toInt(), sqlQuery.value(2).toInt(), sendingTime, receivingTime, sqlQuery.value(9).toString(), sqlQuery.value(10).toString(), sqlQuery.value(11).toString());
 }
 

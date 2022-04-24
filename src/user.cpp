@@ -49,33 +49,28 @@ QString UserManage::addBalance(const QJsonObject &token, int addend) const
     return {};
 }
 
-bool UserManage::transferBalance(const QJsonObject &token, int balance, const QString &dstUser) const
+QString UserManage::transferBalance(const QJsonObject &token, int balance, const QString &dstUser) const
 {
     if (balance >= (int)1e9 || balance <= (int)-1e9)
         return "单次余额改变量不能超过1000000000";
 
     if (!db->queryUserByName(dstUser))
-    {
-        qCritical() << "无法查到另一个用户 " << dstUser;
-        return false;
-    }
+        return "无法查到另一个用户" + dstUser;
 
     int dstBalance = db->queryBalanceByName(dstUser);
     if (dstUser + balance >= (int)1e9)
-    {
-        qCritical() << "余额不能大于1000000000";
-        return false;
-    }
+        return "余额不能大于1000000000";
+
     if (dstUser + balance < 0)
-    {
-        qCritical() << "余额不能为负";
-        return false;
-    }
-    if (!addBalance(token, -balance).isEmpty())
-        return false;
+        return "余额不能为负";
+
+    QString ret = addBalance(token, -balance);
+    if (!ret.isEmpty())
+        return ret;
+
     db->modifyUserBalance(dstUser, dstBalance + balance);
     qDebug() << dstUser << "获得金额: " << balance;
-    return true;
+    return {};
 }
 
 QString UserManage::queryItem(const QJsonObject &token, const QJsonObject &filter, QJsonArray &ret) const
@@ -236,6 +231,11 @@ QString UserManage::addItem(const QJsonObject &token, const QJsonObject &info) c
         return {"寄送时间必须是今天或未来"};
     int id = itemManage->insertItem(15, PENDING_REVEICING, sendingTime, Time(-1, -1, -1), username, info["dstName"].toString(), info["description"].toString());
     qDebug() << "添加快递单号为" << id;
+
+    QString ret = transferBalance(token, 15, "ADMINISTRATOR");
+    if (!ret.isEmpty())
+        return ret;
+
     return {};
 }
 

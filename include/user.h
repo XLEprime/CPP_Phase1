@@ -23,8 +23,8 @@
 #include "item.h"
 #include "time.h"
 
-const int CUSTOMER = 0;
-const int ADMINISTRATOR = 1;
+extern const int CUSTOMER;
+extern const int ADMINISTRATOR;
 extern const int RECEIVED;          //已签收
 extern const int PENDING_REVEICING; //待签收
 
@@ -290,11 +290,10 @@ private:
      * @param token 第一个用户（减去转移余额量的用户）的token
      * @param balance 转移余额量
      * @param srcUser 第二个用户（加上转移余额量的用户）的用户名
-     * @return true 更改成功
-     * @return false 更改失败
+     * @return QString 转钱成功，返回空串，否则返回错误信息.
      * @note 转移余额量可以为负
      */
-    bool transferBalance(const QJsonObject &token, int balance, const QString &dstUser) const;
+    QString transferBalance(const QJsonObject &token, int balance, const QString &dstUser) const;
 };
 
 #endif
