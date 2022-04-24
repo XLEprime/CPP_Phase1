@@ -42,8 +42,7 @@ int main()
     qInstallMessageHandler(messageHandler);
     Database database("defaultConnection", "users.txt");
     ItemManage itemManage(&database);
-    TimeManage timeManage;
-    UserManage userManage(&database, &itemManage, &timeManage);
+    UserManage userManage(&database, &itemManage);
 
     QTextStream istream(stdin);
     QTextStream ostream(stdout);
@@ -53,6 +52,7 @@ int main()
     QVector<QString> userType{"CUSTOMER", "ADMINISTRATOR"};
     QVector<QString> itemState{"", "已签收", "待签收"};
     QString input;
+    Time::init();
 
     qInfo() << "欢迎使用本物流系统，输入 help 获得帮助。";
 
@@ -86,13 +86,13 @@ int main()
         else if (args[0] == "time" && args.size() == 1)
         {
             QJsonObject retInfo;
-            QString ret = userManage.getTime(retInfo);
+            QString ret = Time::getTime(retInfo);
             if (ret.isEmpty())
                 qInfo() << "查询物流系统时间成功，当前时间为" << retInfo["year"].toInt() << "/" << retInfo["month"].toInt() << "/" << retInfo["day"].toInt();
         }
         else if (args[0] == "addtime" && args.size() == 2 && args[1].toInt(&ok) && ok)
         {
-            QString ret = userManage.timeManage->addDays(args[1].toInt());
+            QString ret = Time::addDays(args[1].toInt());
             if (ret.isEmpty())
                 qInfo() << "物流系统时间增加成功。";
         }

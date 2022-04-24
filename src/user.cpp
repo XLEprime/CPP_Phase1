@@ -223,15 +223,6 @@ QString UserManage::getUserInfo(const QJsonObject &token, QJsonObject &ret) cons
     return {};
 }
 
-QString UserManage::getTime(QJsonObject &ret) const
-{
-    qDebug() << "获取物流系统时间信息";
-    ret.insert("year", timeManage->getCurYear());
-    ret.insert("month", timeManage->getCurMonth());
-    ret.insert("day", timeManage->getCurDay());
-    return {};
-}
-
 QString UserManage::addItem(const QJsonObject &token, const QJsonObject &info) const
 {
     QString username = verify(token);
@@ -240,7 +231,11 @@ QString UserManage::addItem(const QJsonObject &token, const QJsonObject &info) c
 
     if (!info.contains("dstName") || !info.contains("description") || !info.contains("sendingTime_Year") || !info.contains("sendingTime_Month") || !info.contains("sendingTime_Day"))
         return "快递物品信息不全";
-    int id = itemManage->insertItem(15, PENDING_REVEICING, Time(info["sendingTime_Year"].toInt(), info["sendingTime_Month"].toInt(), info["sendingTime_Day"].toInt()), Time(-1, -1, -1), username, info["dstName"].toString(), info["description"].toString());
+
+    Time sendingTime{info["sendingTime_Year"].toInt(), info["sendingTime_Month"].toInt(), info["sendingTime_Day"].toInt()};
+    if (!sendingTime.isFuture())
+        return {"寄送时间必须是今天或未来"};
+    int id = itemManage->insertItem(15, PENDING_REVEICING, sendingTime, Time(-1, -1, -1), username, info["dstName"].toString(), info["description"].toString());
     qDebug() << "添加快递单号为" << id;
     return {};
 }

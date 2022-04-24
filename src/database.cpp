@@ -245,7 +245,7 @@ void Database::modifyUserBalance(const QString &username, int balance) const
 int Database::getDBMaxId(const QString &tableName) const
 {
     QSqlQuery sqlQuery(db);
-    sqlQuery.prepare("SELECT MAX(id) FROM" + tableName);
+    sqlQuery.prepare("SELECT MAX(id) FROM " + tableName);
 
     exec(sqlQuery);
     if (!sqlQuery.exec())

@@ -15,7 +15,6 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-#include <QString>
 #include <QSharedPointer>
 #include "time.h"
 
@@ -23,6 +22,7 @@ const int RECEIVED = 1;          //已签收
 const int PENDING_REVEICING = 2; //待签收
 
 class Database;
+class Time;
 
 /**
  * @brief 物品基类
@@ -142,7 +142,7 @@ public:
      * @brief 构造函数
      * @param _db 数据库的指针
      */
-    ItemManage(Database *_db) : db(_db){}
+    ItemManage(Database *_db);
 
     /**
      * @brief 插入一个Item，会自动分配id.

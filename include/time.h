@@ -12,31 +12,53 @@
 #ifndef TIME_H
 #define TIME_H
 
-#include <ctime>
+#include <QString>
+#include <QJsonValue>
 
 // 时间类
 class Time
 {
 public:
-    int year;  //年
-    int month; //月
-    int day;   //日
+    int year;            //年
+    int month;           //月
+    int day;             //日
+    static int curYear;  //物流系统当前年
+    static int curMonth; //物流系统当前月
+    static int curDay;   //物流系统当前日
 
     Time() = default;
+
     Time(int _year, int _month, int _day) : year(_year), month(_month), day(_day){};
+
     ~Time() = default;
-};
 
-//时间管理类
-class TimeManage
-{
-public:
     /**
-     * @brief 构造函数，根据当前操作系统的时间初始化物流系统的年月日
+     * @brief 初始化静态成员变量
      */
-    TimeManage();
+    static void init();
 
-    ~TimeManage() = default;
+    static int getCurYear() { return curYear; };
+
+    static int getCurMonth() { return curMonth; };
+
+    static int getCurDay() { return curDay; };
+
+    /**
+     * @brief 获取物流系统时间
+     *
+     * @param ret 结果
+     * @return QString 成功则返回空串，否则返回错误信息
+     *
+     * 时间信息的格式：
+     * ```json
+     * {
+     *    "year": <字符串>,
+     *    "month": <整数>,
+     *    "day": <整数>
+     * }
+     * ```
+     */
+    static QString getTime(QJsonObject &ret);
 
     /**
      * @brief加快物流系统时间，单位:天
@@ -44,25 +66,23 @@ public:
      * @param dayNum要加快的天数
      * @return QString 成功则返回空串，否则返回错误信息
      */
-    QString addDays(int dayNum);
+    static QString addDays(int dayNum);
 
     /**
      * @brief 判断某时间是否到达，以物流系统时间为判据。
      *
-     * @param time 时间
      * @return true 达到
      * @return false 未到达
      */
-    bool isDue(const Time time) const;
+    bool isDue() const;
 
-    int getCurYear() const { return curTime.year; };
-
-    int getCurMonth() const { return curTime.month; };
-
-    int getCurDay() const { return curTime.day; };
-
-private:
-    Time curTime; //物流系统当前时间
+    /**
+     * @brief 判断某时间是否在将来或是今天，以物流系统时间为判据。
+     *
+     * @return true 是在将来或是今天
+     * @return false 不是在将来或是今天
+     */
+    bool isFuture() const;
 };
 
 #endif

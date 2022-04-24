@@ -12,6 +12,9 @@
 #include "../include/item.h"
 #include "../include/database.h"
 
+ItemManage::ItemManage(Database *_db) : db(_db)
+{ total = db->getDBMaxId("item"); }
+
 int ItemManage::insertItem(
     const int cost,
     const int state,

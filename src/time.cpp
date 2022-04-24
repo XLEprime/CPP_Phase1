@@ -8,41 +8,62 @@
  * @copyright Copyright (c) 2022
  *
  */
-
-#include <QDebug>
 #include "../include/time.h"
+#include "../include/user.h"
 
-TimeManage::TimeManage()
+#include <ctime>
+#include <QDebug>
+
+int Time::curYear = 0;
+int Time::curMonth = 0;
+int Time::curDay = 0;
+
+void Time::init()
 {
     time_t rawTime;
     time(&rawTime);
     struct tm *tm_curTime = localtime(&rawTime);
-    curTime.year = tm_curTime->tm_year + 1900;
-    curTime.month = tm_curTime->tm_mon + 1;
-    curTime.day = tm_curTime->tm_mday;
-    qInfo() << "当前物流系统时间为" << curTime.year << "/" << curTime.month << "/" << curTime.day;
+    curYear = tm_curTime->tm_year + 1900;
+    curMonth = tm_curTime->tm_mon + 1;
+    curDay = tm_curTime->tm_mday;
+    qInfo() << "当前物流系统时间为" << curYear << "/" << curMonth << "/" << curDay;
 }
 
-QString TimeManage::addDays(int dayNum)
+QString Time::addDays(int dayNum)
 {
     if (dayNum <= 0)
         return "要加快的天数应该为正数";
-    curTime.day += dayNum;
-    while (curTime.day > 31)
+    curDay += dayNum;
+    while (curDay > 31)
     {
-        curTime.day -= 31;
-        curTime.month++;
+        curDay -= 31;
+        curMonth++;
     }
-    while (curTime.day > 12)
+    while (curMonth > 12)
     {
-        curTime.day -= 12;
-        curTime.year++;
+        curMonth -= 12;
+        curYear++;
     }
-    qDebug() << "物流系统时间增加" << dayNum << "天，当前物流系统时间为" << curTime.year << "/" << curTime.month << "/" << curTime.day;
+    qDebug() << "物流系统时间增加" << dayNum << "天，当前物流系统时间为" << curYear << "/" << curMonth << "/" << curDay;
     return "";
 }
 
-bool TimeManage::isDue(const Time time) const
+QString Time::getTime(QJsonObject &ret)
 {
-    return ((time.year < curTime.year) || (time.year == curTime.year && time.month < curTime.month) || (time.year == curTime.year && time.month == curTime.month && time.day < curTime.day));
+    qDebug() << "获取物流系统时间信息";
+    ret.insert("year", Time::getCurYear());
+    ret.insert("month", Time::getCurMonth());
+    ret.insert("day", Time::getCurDay());
+    return {};
+}
+
+bool Time::isDue() const
+{
+    return ((year < curYear) || (year == curYear && month < curMonth) || (year == curYear && month == curMonth && day <= curDay));
+}
+
+bool Time::isFuture() const
+{
+    return ((year > curYear) || (year == curYear && month > curMonth) || (year == curYear && month == curMonth && day >= curDay));
+
 }
