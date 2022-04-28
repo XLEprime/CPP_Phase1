@@ -260,6 +260,9 @@ QString UserManage::addItem(const QJsonObject &token, const QJsonObject &info) c
     if (!info.contains("dstName") || !info.contains("description") || !info.contains("sendingTime_Year") || !info.contains("sendingTime_Month") || !info.contains("sendingTime_Day"))
         return "快递物品信息不全";
 
+    if(!db->queryUserByName(info["dstName"].toString()))
+        return "收件用户不存在";
+
     Time sendingTime{info["sendingTime_Year"].toInt(), info["sendingTime_Month"].toInt(), info["sendingTime_Day"].toInt()};
     if (!sendingTime.isFuture())
         return {"寄送时间必须是今天或未来"};
