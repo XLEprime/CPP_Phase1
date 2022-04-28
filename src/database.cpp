@@ -182,7 +182,7 @@ bool Database::queryUserByName(const QString &username) const
     exec(sqlQuery);
     if (sqlQuery.exec())
     {
-        qDebug() << "数据库:查找user " << username << " 成功";
+        qDebug() << "数据库:查找user" << username << "成功";
         if (sqlQuery.next())
         {
             if (usernameSet.find(username) != usernameSet.constEnd())
@@ -191,6 +191,7 @@ bool Database::queryUserByName(const QString &username) const
                 qFatal("数据库和文件不同步");
             return true;
         }
+        qDebug() << "数据库:" << username << "在数据库中不存在";
         return false;
     }
     else
