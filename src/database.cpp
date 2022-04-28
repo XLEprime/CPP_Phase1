@@ -44,7 +44,10 @@ Database::Database(const QString &connectionName, const QString &fileName) : use
         sqlQuery.prepare("CREATE TABLE user( username TEXT PRIMARY KEY NOT NULL,"
                          "password TEXT NOT NULL,"
                          "type INT NOT NULL,"
-                         "balance INT NOT NULL) ");
+                         "balance INT NOT NULL,"
+                         "name TEXT NOT NULL,"
+                         "phonenumber TEXT NOT NULL,"
+                         "address TEXT NOT NULL) ");
 
         exec(sqlQuery);
         if (!sqlQuery.exec())
@@ -96,7 +99,7 @@ Database::Database(const QString &connectionName, const QString &fileName) : use
             isAdministratorExist = true;
     }
     if (!isAdministratorExist)
-        insertUser("ADMINISTRATOR", "123", ADMINISTRATOR, 0);
+        insertUser("ADMINISTRATOR", "123", ADMINISTRATOR, 0, "Administrator1", "88888888", "环宇物流大厦");
 }
 
 bool Database::modifyData(const QString &tableName, const QString &primaryKey, const QString &key, int value) const
@@ -147,17 +150,20 @@ bool Database::modifyData(const QString &tableName, const QString &primaryKey, c
     }
 }
 
-void Database::insertUser(const QString &username, const QString &password, int type, int balance)
+void Database::insertUser(const QString &username, const QString &password, int type, int balance, const QString &name, const QString &phoneNumber, const QString &address)
 {
     QSqlQuery sqlQuery(db);
-    sqlQuery.prepare("INSERT INTO user VALUES(:username, :password, :type, :balance)");
+    sqlQuery.prepare("INSERT INTO user VALUES(:username, :password, :type, :balance, :name, :phonenumber, :address)");
     sqlQuery.bindValue(":username", username);
     sqlQuery.bindValue(":password", password);
     sqlQuery.bindValue(":type", type);
     sqlQuery.bindValue(":balance", balance);
+    sqlQuery.bindValue(":name", name);
+    sqlQuery.bindValue(":phonenumber", phoneNumber);
+    sqlQuery.bindValue(":address", address);
 
     exec(sqlQuery);
-    if (!sqlQuery.exec())
+    if (sqlQuery.exec())
     {
         qDebug() << "数据库:插入user " << username << " 成功";
         usernameSet.insert(username);
@@ -194,10 +200,10 @@ bool Database::queryUserByName(const QString &username) const
     }
 }
 
-bool Database::queryUserByName(const QString &username, QString &password, int &type, int &balance) const
+bool Database::queryUserByName(const QString &username, QString &retPassword, int &retType, int &retBalance, QString &retName, QString &retPhoneNumber, QString &retAddress) const
 {
     QSqlQuery sqlQuery(db);
-    sqlQuery.prepare("SELECT password, type, balance FROM user WHERE username = :username");
+    sqlQuery.prepare("SELECT password, type, balance, name, phonenumber, address FROM user WHERE username = :username");
     sqlQuery.bindValue(":username", username);
 
     exec(sqlQuery);
@@ -210,9 +216,13 @@ bool Database::queryUserByName(const QString &username, QString &password, int &
     {
         if (sqlQuery.next())
         {
-            password = sqlQuery.value(0).toString();
-            type = sqlQuery.value(1).toInt();
-            balance = sqlQuery.value(2).toInt();
+            retPassword = sqlQuery.value(0).toString();
+            retType = sqlQuery.value(1).toInt();
+            retBalance = sqlQuery.value(2).toInt();
+            retName= sqlQuery.value(3).toString();
+            retPhoneNumber = sqlQuery.value(4).toString();
+            retAddress= sqlQuery.value(5).toString();
+
             qDebug() << "数据库: 用户 " << username << "查找成功";
             return true;
         }

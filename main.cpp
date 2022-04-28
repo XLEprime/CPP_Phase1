@@ -67,7 +67,7 @@ int main()
         {
             qInfo() << "系统时间: time";
             qInfo() << "加快系统时间: addtime <天数>";
-            qInfo() << "注册: register <用户名> <密码>";
+            qInfo() << "注册: register <用户名> <密码> <姓名> <电话号码> <地址>";
             qInfo() << "登录: login <用户名> <密码>";
             qInfo() << "登出: logout";
             qInfo() << "修改密码: changepassword <新密码>";
@@ -99,14 +99,14 @@ int main()
             if (ret.isEmpty())
                 qInfo() << "物流系统时间增加成功。";
         }
-        else if (args[0] == "register" && args.size() == 3) // register 用户名 密码 在phase2开始添加type
+        else if (args[0] == "register" && args.size() == 6) //在phase2开始添加type
         {
             if (!token.isNull())
             {
                 qInfo() << "当前已有用户登录，请登出后重试。";
                 continue;
             }
-            QString ret = userManage.registerUser(args[1], args[2], 0);
+            QString ret = userManage.registerUser(args[1], args[2], 0, args[3], args[4], args[5]);
             if (ret.isEmpty())
                 qInfo() << "用户 " << args[1] << " 注册成功";
             else
@@ -167,7 +167,12 @@ int main()
             QString ret = userManage.getUserInfo(token.toObject(), retInfo);
             if (ret.isEmpty())
             {
-                qInfo() << "查询用户信息成功 用户名为 " << retInfo["username"].toString() << " 类型为 " << userType[retInfo["type"].toInt()] << " 余额为 " << retInfo["balance"].toInt();
+                qInfo() << "查询用户信息成功 用户名为" << retInfo["username"].toString()
+                        << "类型为" << userType[retInfo["type"].toInt()]
+                        << "余额为" << retInfo["balance"].toInt()
+                        << "姓名为" << retInfo["name"].toString()
+                        << "电话为" << retInfo["phonenumber"].toString()
+                        << "住址为" << retInfo["address"].toString();
             }
         }
         else if (args[0] == "alluserinfo" && args.size() == 1)
@@ -185,7 +190,12 @@ int main()
                 for (const auto &i : queryRet)
                 {
                     QJsonObject user = i.toObject();
-                    qInfo() << "用户名 " << user["username"].toString() << " 类型为 " << userType[user["type"].toInt()] << " 余额为 " << user["balance"].toInt();
+                    qInfo() << "查询用户信息成功 用户名为" << user["username"].toString()
+                            << "类型为" << userType[user["type"].toInt()]
+                            << "余额为" << user["balance"].toInt()
+                            << "姓名为" << user["name"].toString()
+                            << "电话为" << user["phonenumber"].toString()
+                            << "住址为" << user["address"].toString();
                 }
             }
             else

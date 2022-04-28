@@ -56,8 +56,11 @@ public:
      * @param password 密码
      * @param type 用户类型
      * @param balance 余额
+     * @param name 姓名
+     * @param phoneNumber 电话号码
+     * @param address 地址
      */
-    void insertUser(const QString &username, const QString &password, int type, int balance);
+    void insertUser(const QString &username, const QString &password, int type, int balance, const QString &name, const QString &phoneNumber, const QString &address);
 
     /**
      * @brief 根据用户名查询用户是否存在
@@ -70,11 +73,17 @@ public:
     /**
      * @brief 根据用户名查询用户是否存在且返回密码，用户类型，余额
      *
-     * @param username
-     * @return true
-     * @return false
+     * @param username 用户名
+     * @param retPassword 返回密码
+     * @param retType 返回UserType
+     * @param retBalance 返回余额
+     * @param retName 返回姓名
+     * @param retPhoneNumber 返回电话号码
+     * @param retAddress 返回地址
+     * @return true 查询到用户
+     * @return false 没查询到用户
      */
-    bool queryUserByName(const QString &username, QString &password, int &type, int &balance) const;
+    bool queryUserByName(const QString &username, QString &retPassword, int &retType, int &retBalance, QString &retName, QString &retPhoneNumber, QString &retAddress) const;
 
     /**
      * @brief 获得用户名对应的余额

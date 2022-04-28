@@ -35,14 +35,43 @@ extern const int PENDING_REVEICING; //待签收
 class User
 {
 public:
-    User() = default;
+    User() = delete;
 
     /**
      * @brief 构造函数
      *
      * @param _balance 余额
      */
-    User(int _balance) : balance(_balance){};
+
+    /**
+     * @brief 构造函数
+     *
+     * @param _username 用户名
+     * @param _password 密码
+     * @param _balance 余额
+     * @param _name 姓名
+     * @param _phoneNumber 电话号码
+     * @param _address 地址
+     */
+    User(const QString &_username, const QString &_password, int _balance, const QString &_name, const QString &_phoneNumber, const QString &_address) : username(_username), password(_password), balance(_balance), type(-1), name(_name), phoneNumber(_phoneNumber), address(_address){};
+
+    /**
+     * @brief 获得用户名
+     * @return const QString& 用户名
+     */
+    const QString &getUsername() const { return username; }
+
+    /**
+     * @brief 获得密码
+     * @return const QString& 密码
+     */
+    const QString &getPassword() const { return password; }
+
+    /**
+     * @brief 获得用户余额
+     * @return int 余额
+     */
+    int getBalance() const { return balance; }
 
     /**
      * @brief 获得用户类型
@@ -51,10 +80,22 @@ public:
     virtual int getUserType() const = 0;
 
     /**
-     * @brief 获得用户余额
-     * @return int 余额
+     * @brief 获得姓名
+     * @return const QString& 姓名
      */
-    int getBalance() const { return balance; }
+    const QString &getName() const { return name; }
+
+    /**
+     * @brief 获得电话号码
+     * @return const QString& 电话号码
+     */
+    const QString &getPhoneNumber() const { return phoneNumber; }
+
+    /**
+     * @brief 获得地址
+     * @return const QString& 地址
+     */
+    const QString &getAddress() const { return address; }
 
     /**
      * @brief 改变余额
@@ -65,7 +106,13 @@ public:
     virtual ~User() = default;
 
 protected:
-    int balance; //余额
+    QString username;    //用户名
+    QString password;    //用户密码
+    int balance;         //余额
+    int type;            //用户类型
+    QString name;        //姓名
+    QString phoneNumber; //电话号码
+    QString address;     //地址
 };
 
 /**
@@ -74,13 +121,19 @@ protected:
 class Customer : public User
 {
 public:
-    Customer() = default;
+    Customer() = delete;
 
     /**
      * @brief 构造函数
+     *
+     * @param _username 用户名
+     * @param _password 密码
      * @param _balance 余额
+     * @param _name 姓名
+     * @param _phoneNumber 电话号码
+     * @param _address 地址
      */
-    Customer(int _balance) : User(_balance) {}
+    Customer(const QString &_username, const QString &_password, int _balance, const QString &_name, const QString &_phoneNumber, const QString &_address) : User(_username, _password, _balance, _name, _phoneNumber, _address) { type = CUSTOMER; }
 
     /**
      * @brief 获得用户类
@@ -96,13 +149,20 @@ public:
 class Administrator : public User
 {
 public:
-    Administrator() = default;
+    Administrator() = delete;
 
     /**
      * @brief 构造函数
+     *
+     * @param _username 用户名
+     * @param _password 密码
      * @param _balance 余额
+     * @param _type UserType
+     * @param _name 姓名
+     * @param _phoneNumber 电话号码
+     * @param _address 地址
      */
-    Administrator(int _balance) : User(_balance) {}
+    Administrator(const QString &_username, const QString &_password, int _balance, const QString &_name, const QString &_phoneNumber, const QString &_address) : User(_username, _password, _balance, _name, _phoneNumber, _address) { type = ADMINISTRATOR; }
 
     /**
      * @brief 获得用户类
@@ -132,11 +192,14 @@ public:
      * @param username 用户名
      * @param password 密码
      * @param type 注册的账号类型 0为CUSTOMER, 2为EXPRESSMAN(Phase2开始出现)
+     * @param name 姓名
+     * @param phoneNumber 电话号码
+     * @param address 地址
      * @return QString 如果注册成功，返回空串，否则返回错误信息.
      * @note ADMINISTRATOR不用支持注册.
      * @note register是关键字，不能作为函数名.
      */
-    QString registerUser(const QString &username, const QString &password, int type) const;
+    QString registerUser(const QString &username, const QString &password, int type, const QString &name, const QString &phoneNumber, const QString &address) const;
 
     /**
      * @brief 登录
@@ -176,6 +239,9 @@ public:
      *    "username": <字符串>,
      *    "type": <整数>,
      *    "balance": <整数>
+     *    "name": <字符串>,
+     *    "phonenumber": <字符串>,
+     *    "address": <字符串>,
      * }
      * ```
      */
@@ -193,6 +259,9 @@ public:
      *    "username": <字符串>,
      *    "type": <整数>,
      *    "balance": <整数>
+     *    "name": <字符串>,
+     *    "phonenumber": <字符串>,
+     *    "address": <字符串>,
      * }
      * ```
      */

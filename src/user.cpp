@@ -143,7 +143,7 @@ QString UserManage::queryItem(const QJsonObject &token, const QJsonObject &filte
     return {};
 }
 
-QString UserManage::registerUser(const QString &username, const QString &password, int type) const
+QString UserManage::registerUser(const QString &username, const QString &password, int type, const QString &name, const QString &phoneNumber, const QString &address) const
 {
     if (username.isEmpty() || username.size() > 10)
         return "用户名长度应该在1~10之间";
@@ -151,7 +151,7 @@ QString UserManage::registerUser(const QString &username, const QString &passwor
         return "该用户名已被注册";
     if (type == ADMINISTRATOR)
         return "管理员类不支持注册";
-    db->insertUser(username, password, type, 0);
+    db->insertUser(username, password, type, 0, name, phoneNumber, address);
     qDebug() << "用户 " << username << " 注册成功";
     return {};
 }
@@ -161,17 +161,20 @@ QString UserManage::login(const QString &username, const QString &password, QJso
     QString retPassword;
     int retType;
     int retBalance;
-    if (db->queryUserByName(username, retPassword, retType, retBalance) && retPassword == password)
+    QString retName;
+    QString retPhoneNumber;
+    QString retAddress;
+    if (db->queryUserByName(username, retPassword, retType, retBalance, retName, retPhoneNumber, retAddress) && retPassword == password)
     {
         switch (retType)
         {
         case CUSTOMER:
             if (!userMap[username])
-                userMap[username] = QSharedPointer<Customer>::create(retBalance);
+                userMap[username] = QSharedPointer<Customer>::create(username, retPassword, retBalance, retName, retPhoneNumber, retAddress);
             break;
         case ADMINISTRATOR:
             if (!userMap[username])
-                userMap[username] = QSharedPointer<Administrator>::create(retBalance);
+                userMap[username] = QSharedPointer<Administrator>::create(username, retPassword, retBalance, retName, retPhoneNumber, retAddress);
             break;
         default:
             return "数据库中用户类型错误";
@@ -214,6 +217,9 @@ QString UserManage::getUserInfo(const QJsonObject &token, QJsonObject &ret) cons
     ret.insert("username", username);
     ret.insert("type", userMap[username]->getUserType());
     ret.insert("balance", userMap[username]->getBalance());
+    ret.insert("name", userMap[username]->getName());
+    ret.insert("phonenumber", userMap[username]->getPhoneNumber());
+    ret.insert("address", userMap[username]->getAddress());
     return {};
 }
 
@@ -224,16 +230,22 @@ QString UserManage::queryAllUserInfo(const QJsonObject &token, QJsonArray &ret) 
         return "验证失败";
     if (userMap[username]->getUserType() != ADMINISTRATOR)
         return "非管理员不能查看所有用户信息";
-    for (QString i : db->usernameSet)
+    for (QString username : db->usernameSet)
     {
         QString retPassword;
         int retType;
         int retBalance;
-        db->queryUserByName(i, retPassword, retType, retBalance);
+        QString retName;
+        QString retPhoneNumber;
+        QString retAddress;
+        db->queryUserByName(username, retPassword, retType, retBalance, retName, retPhoneNumber, retAddress);
         QJsonObject itemJson;
-        itemJson.insert("username", i);
+        itemJson.insert("username", username);
         itemJson.insert("type", retType);
         itemJson.insert("balance", retBalance);
+        itemJson.insert("name", retName);
+        itemJson.insert("phonenumber", retPhoneNumber);
+        itemJson.insert("address", retAddress);
         ret.append(itemJson);
     }
     return {};
