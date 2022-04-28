@@ -251,7 +251,7 @@ QString UserManage::queryAllUserInfo(const QJsonObject &token, QJsonArray &ret) 
     return {};
 }
 
-QString UserManage::addItem(const QJsonObject &token, const QJsonObject &info) const
+QString UserManage::sendItem(const QJsonObject &token, const QJsonObject &info) const
 {
     QString username = verify(token);
     if (username.isEmpty())

@@ -336,14 +336,13 @@ public:
      * @note 物品信息格式:
      * ```json
      * {
-     *      "sendingTime_Year" : <整数>,
-     *      "sendingTime_Month" : <整数>,
-     *      "sendingTime_Day" : <整数>,
      *      "dstName" : <字符串>
+     *      "itemType" : <整数>
+     *      "itemType" : <整数>
      *      "description" : <字符串>
      * }
      */
-    QString addItem(const QJsonObject &token, const QJsonObject &info) const;
+    QString sendItem(const QJsonObject &token, const QJsonObject &info) const;
 
     /**
      * @brief 发送快递物品
