@@ -436,11 +436,11 @@ bool Database::deleteItem(const int id) const
     if (!sqlQuery.exec())
     {
         qCritical() << "数据库删除id为 " << id << " 的项失败";
-        return true;
+        return false;
     }
     else
     {
         qDebug() << "数据库删除id为 " << id << " 的项成功";
-        return false;
+        return true;
     }
 }
