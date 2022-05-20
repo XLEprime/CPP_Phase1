@@ -179,16 +179,6 @@ bool Database::queryUserByName(const QString &targetUsername) const
     }
     qDebug() << "文件:" << targetUsername << "在文件中存在";
     return true;
-
-    QTextStream stream;
-    int type, balance;
-    QString username, password, name, phoneNumber, address;
-    char ch;
-    while (!stream.atEnd() && username != targetUsername)
-    {
-        stream >> username >> password >> type >> balance >> name >> phoneNumber >> address;
-        stream >> ch; //吃一个回车
-    }
 }
 
 bool Database::queryUserByName(const QString &targetUsername, QString &retPassword, int &retType, int &retBalance, QString &retName, QString &retPhoneNumber, QString &retAddress) const
