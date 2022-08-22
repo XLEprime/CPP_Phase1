@@ -155,8 +155,6 @@ public:
      * @param dstName 收件用户的用户名
      * @param description 物品描述
      * @return int 为添加的快递分配的单号
-     *
-     * @note pahse1默认cost为15
      */
     int insertItem(
         const int cost,
